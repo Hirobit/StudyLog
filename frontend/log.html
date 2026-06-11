@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>StudyLog - ログ詳細</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+
+    header { background: #ccc; padding: 12px 16px; display: flex; align-items: center; gap: 16px; }
+    .header-title { font-size: 18px; font-weight: bold; flex: 1; }
+    .header-meta { font-size: 13px; color: #444; }
+    .header-brand { font-size: 13px; color: #888; }
+    .home-btn { padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; }
+
+    .breadcrumb { font-size: 13px; color: #444; background: #e8e8e8; padding: 8px 16px; }
+    .layout { display: flex; height: calc(100vh - 90px); position: relative; }
+
+    /* スライドサイドバー */
+    .slide-sidebar {
+      position: absolute;
+      top: 0; left: 0;
+      width: 180px;
+      height: 100%;
+      background: #ccc;
+      padding: 16px;
+      box-sizing: border-box;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 50;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+    }
+    .slide-sidebar.open { transform: translateX(0); }
+    .slide-sidebar h3 { margin: 0 0 16px; font-size: 15px; }
+    .slide-sidebar ul { list-style: none; padding: 0; }
+    .slide-sidebar ul li { margin: 10px 0; font-size: 14px; cursor: pointer; }
+    .slide-sidebar ul li:hover { font-weight: bold; }
+
+    /* 不明点サイドバー */
+    .sidebar { width: 180px; background: #ddd; padding: 16px; border-right: 1px solid #ccc; flex-shrink: 0; }
+    .menu-btn { background: #eee; border: 1px solid #ccc; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 16px; margin-bottom: 16px; display: block; }
+    .sidebar h3 { margin: 0 0 12px; font-size: 15px; }
+    .sidebar ul { list-style: none; padding: 0; }
+    .sidebar ul li { font-size: 13px; margin-bottom: 10px; }
+
+    /* メインエリア */
+    .main { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .title-box { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; font-size: 18px; font-weight: bold; text-align: center; }
+    .memo-box { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 16px; background: #f0f0f0; font-size: 15px; line-height: 1.8; }
+    .memo-box h4 { margin: 0 0 12px; font-size: 15px; text-align: center; }
+
+    /* オーバーレイ */
+    .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; }
+    .overlay.open { display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="home-btn" onclick="location.href='index.html'">⌂ ホーム</button>
+    <div class="header-title" id="header-title"></div>
+    <div class="header-meta" id="header-meta"></div>
+    <div class="header-brand">StudyLog</div>
+  </header>
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <div class="layout">
+
+    <!-- スライドサイドバー -->
+    <div class="slide-sidebar" id="slide-sidebar">
+      <h3>カテゴリ一覧</h3>
+      <ul id="slide-category-list"></ul>
+    </div>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- 不明点サイドバー -->
+    <div class="sidebar">
+      <button class="menu-btn" onclick="toggleSidebar()">…</button>
+      <h3>不明点</h3>
+      <ul id="memo2-list"></ul>
+    </div>
+
+    <!-- メインエリア -->
+    <div class="main">
+      <div class="title-box" id="title-box"></div>
+      <div class="memo-box">
+        <h4>メモ</h4>
+        <div id="memo-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    const params = new URLSearchParams(location.search);
+    const logId = params.get("log_id");
+
+    async function loadLog() {
+      const res = await fetch(`${API}/logs/detail/${logId}`);
+      const log = await res.json();
+      document.getElementById("header-title").textContent = `・${log.title}`;
+      document.getElementById("header-meta").textContent = log.created_at ? log.created_at.slice(0, 10) : "";
+      document.getElementById("breadcrumb").textContent = log.title;
+      document.getElementById("title-box").textContent = `学習内容　${log.title}`;
+      document.getElementById("memo-content").textContent = log.memo || "";
+      const ul = document.getElementById("memo2-list");
+      if (log.memo2) {
+        log.memo2.split("\n").forEach(line => {
+          if (line.trim()) {
+            const li = document.createElement("li");
+            li.textContent = `・${line}`;
+            ul.appendChild(li);
+          }
+        });
+      }
+    }
+
+    async function loadSlideCategories() {
+      const res = await fetch(`${API}/categories`);
+      const categories = await res.json();
+      const ul = document.getElementById("slide-category-list");
+      categories.forEach(cat => {
+        const li = document.createElement("li");
+        li.textContent = `・${cat.name}`;
+        li.onclick = () => {
+          location.href = `category.html?category_id=${cat.id}&category_name=${cat.name}`;
+        };
+        ul.appendChild(li);
+      });
+    }
+
+    function toggleSidebar() {
+      document.getElementById("slide-sidebar").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("open");
+    }
+
+    function closeSidebar() {
+      document.getElementById("slide-sidebar").classList.remove("open");
+      document.getElementById("overlay").classList.remove("open");
+    }
+
+    loadLog();
+    loadSlideCategories();
+  </script>
+</body>
+</html>

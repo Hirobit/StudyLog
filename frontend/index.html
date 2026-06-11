@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>StudyLog</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; }
+    .layout { display: flex; height: calc(100vh - 60px); }
+    .sidebar { width: 200px; background: #ddd; padding: 16px; }
+    .sidebar h2 { margin: 0 0 16px; }
+    .sidebar ul { list-style: none; padding: 0; }
+    .sidebar ul li { margin: 8px 0; display: flex; align-items: center; gap: 6px; }
+    .cat-name { flex: 1; cursor: pointer; }
+    .cat-name:hover { font-weight: bold; }
+    .btn-small { padding: 2px 8px; font-size: 12px; cursor: pointer; border: 1px solid #aaa; border-radius: 4px; background: #eee; }
+    .btn-small.del { background: #fdd; }
+    .add-btn { margin-top: 16px; padding: 6px 12px; background: #555; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .main { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; font-size: 18px; }
+
+    /* モーダル */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; }
+    .modal { background: white; width: 320px; margin: 200px auto; padding: 24px; border-radius: 8px; }
+    .modal h3 { margin: 0 0 16px; }
+    .modal input { width: 100%; padding: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; }
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-buttons button { padding: 6px 16px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-save { background: #555; color: white; }
+    .btn-cancel { background: #eee; }
+  </style>
+</head>
+<body>
+  <header>StudyLog</header>
+  <div class="layout">
+    <div class="sidebar">
+      <h2>Log</h2>
+      <ul id="category-list"></ul>
+      <button class="add-btn" onclick="openModal()">＋ カテゴリ追加</button>
+    </div>
+    <div class="main">あなたの軌跡を記録しましょう</div>
+  </div>
+
+  <!-- モーダル -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h3 id="modal-title">カテゴリ追加</h3>
+      <input type="text" id="modal-input" placeholder="カテゴリ名を入力">
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+        <button class="btn-save" onclick="saveCategory()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    let editingId = null;
+
+    async function loadCategories() {
+      const res = await fetch(`${API}/categories`);
+      const categories = await res.json();
+      const ul = document.getElementById("category-list");
+      ul.innerHTML = "";
+      categories.forEach(cat => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span class="cat-name" onclick="location.href='category.html?category_id=${cat.id}&category_name=${cat.name}'">・${cat.name}</span>
+          <button class="btn-small" onclick="openEditModal(${cat.id}, '${cat.name}')">編集</button>
+          <button class="btn-small del" onclick="deleteCategory(${cat.id})">削除</button>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    function openModal() {
+      editingId = null;
+      document.getElementById("modal-title").textContent = "カテゴリ追加";
+      document.getElementById("modal-input").value = "";
+      document.getElementById("modal-overlay").style.display = "block";
+    }
+
+    function openEditModal(id, name) {
+      editingId = id;
+      document.getElementById("modal-title").textContent = "カテゴリ編集";
+      document.getElementById("modal-input").value = name;
+      document.getElementById("modal-overlay").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("modal-overlay").style.display = "none";
+    }
+
+    async function saveCategory() {
+      const name = document.getElementById("modal-input").value.trim();
+      if (!name) return;
+
+      if (editingId) {
+        await fetch(`${API}/categories/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+      } else {
+        await fetch(`${API}/categories`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+      }
+      closeModal();
+      loadCategories();
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm("削除しますか？")) return;
+      await fetch(`${API}/categories/${id}`, { method: "DELETE" });
+      loadCategories();
+    }
+
+    loadCategories();
+  </script>
+</body>
+</html>
