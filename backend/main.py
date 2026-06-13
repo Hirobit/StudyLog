@@ -173,3 +173,9 @@ def delete_log(id: int, db: Session = Depends(get_db)):
     db.delete(db_log)
     db.commit()
     return {"message": "Deleted"}
+
+# フロントエンドの静的ファイルを配信する設定
+# directory="../frontend" → backendフォルダから見て一つ上のfrontendフォルダを指定
+# html=True → index.htmlをルートURL(/)で表示する設定
+from fastapi.staticfiles import StaticFiles
+app.mount("/", StaticFiles(directory="../frontend", html=True), name="static")

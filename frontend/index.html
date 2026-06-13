@@ -53,7 +53,9 @@
   </div>
 
   <script>
-    const API = "http://127.0.0.1:8000";
+    const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
+   ? "http://127.0.0.1:8000"
+   : window.location.origin;
     let editingId = null;
 
     async function loadCategories() {
