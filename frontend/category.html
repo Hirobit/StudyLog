@@ -192,9 +192,12 @@
     }
 
     async function deleteSubcategory(id) {
-      if (!confirm("削除しますか？\n配下のサブカテゴリとログも全て削除されます。")) return;
+      if (!confirm("削除しますか？\n配下のログも全て削除されます。")) return;
       await fetch(`${API}/subcategories/${id}`, { method: "DELETE" });
       loadSubcategories();
+      document.getElementById("log-list").innerHTML = "";
+      document.getElementById("subcategory-name").textContent = "";
+      document.getElementById("add-log-btn").style.display = "none";
     }
 
     // ログモーダル
