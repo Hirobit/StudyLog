@@ -36,4 +36,107 @@
     .memo-box textarea { flex: 1; width: 100%; padding: 8px; font-size: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; resize: none; background: white; line-height: 1.8; }
 
     /* 保存ボタン */
-    .save-btn { position: absolute; bottom: 24px; right: 24px; padding: 12px 32px; background: #444; color: white; border: none; border-radius: 8px; cursor:
+    .save-btn { position: absolute; bottom: 24px; right: 24px; padding: 12px 32px; background: #444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .save-btn:hover { background: #222; }
+
+    /* オーバーレイ */
+    .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; }
+    .overlay.open { display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="home-btn" onclick="location.href='index.html'">⌂ ホーム</button>
+    <button class="menu-btn" onclick="toggleSidebar()">☰ メニュー</button>
+    <div class="header-title" id="header-title"></div>
+    <div class="header-meta" id="header-meta"></div>
+    <div class="header-brand">StudyLog</div>
+  </header>
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <div class="layout">
+    <div class="slide-sidebar" id="slide-sidebar">
+      <h3>カテゴリ一覧</h3>
+      <ul id="slide-category-list"></ul>
+    </div>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- 不明点サイドバー -->
+    <div class="sidebar">
+      <h3>不明点</h3>
+      <textarea id="memo2-input" placeholder="不明点を入力..."></textarea>
+    </div>
+
+    <!-- メインエリア -->
+    <div class="main">
+      <div class="title-box" id="title-box"></div>
+      <div class="memo-box">
+        <h4>メモ</h4>
+        <textarea id="memo-input" placeholder="メモを入力..."></textarea>
+      </div>
+      <button class="save-btn" onclick="saveMemo()">保存</button>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
+      ? "http://127.0.0.1:8000"
+      : window.location.origin;
+    const params = new URLSearchParams(location.search);
+    const logId = params.get("log_id");
+    let currentLog = null;
+
+    async function loadLog() {
+      const res = await fetch(`${API}/logs/detail/${logId}`);
+      currentLog = await res.json();
+      document.getElementById("header-title").textContent = `・${currentLog.title}`;
+      document.getElementById("header-meta").textContent = currentLog.created_at ? currentLog.created_at.slice(0, 10) : "";
+      document.getElementById("breadcrumb").textContent = currentLog.title;
+      document.getElementById("title-box").textContent = `学習内容　${currentLog.title}`;
+      document.getElementById("memo-input").value = currentLog.memo || "";
+      document.getElementById("memo2-input").value = currentLog.memo2 || "";
+    }
+
+    async function saveMemo() {
+      const memo = document.getElementById("memo-input").value;
+      const memo2 = document.getElementById("memo2-input").value;
+      await fetch(`${API}/logs/${logId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: currentLog.title,
+          memo: memo,
+          memo2: memo2,
+          subcategory_id: currentLog.subcategory_id
+        })
+      });
+      alert("保存しました");
+    }
+
+    async function loadSlideCategories() {
+      const res = await fetch(`${API}/categories`);
+      const categories = await res.json();
+      const ul = document.getElementById("slide-category-list");
+      categories.forEach(cat => {
+        const li = document.createElement("li");
+        li.textContent = `・${cat.name}`;
+        li.onclick = () => location.href = `category.html?category_id=${cat.id}&category_name=${cat.name}`;
+        ul.appendChild(li);
+      });
+    }
+
+    function toggleSidebar() {
+      document.getElementById("slide-sidebar").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("open");
+    }
+
+    function closeSidebar() {
+      document.getElementById("slide-sidebar").classList.remove("open");
+      document.getElementById("overlay").classList.remove("open");
+    }
+
+    loadLog();
+    loadSlideCategories();
+  </script>
+</body>
+</html>
