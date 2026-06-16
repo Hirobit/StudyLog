@@ -80,8 +80,6 @@
     <div class="modal">
       <h3 id="log-modal-title">ログ作成</h3>
       <input type="text" id="log-title-input" placeholder="タイトル">
-      <input type="text" id="log-memo-input" placeholder="メモ">
-      <input type="text" id="log-memo2-input" placeholder="不明点">
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeLogModal()">キャンセル</button>
         <button class="btn-save" onclick="saveLog()">保存</button>
@@ -212,10 +210,8 @@
 
     function openLogEditModal(id, title, memo, memo2) {
       editingLogId = id;
-      document.getElementById("log-modal-title").textContent = "ログ編集";
+      document.getElementById("log-modal-title").textContent = "タイトル編集";
       document.getElementById("log-title-input").value = title;
-      document.getElementById("log-memo-input").value = memo;
-      document.getElementById("log-memo2-input").value = memo2;
       document.getElementById("log-modal").style.display = "block";
     }
 
@@ -225,21 +221,19 @@
 
     async function saveLog() {
       const title = document.getElementById("log-title-input").value.trim();
-      const memo = document.getElementById("log-memo-input").value.trim();
-      const memo2 = document.getElementById("log-memo2-input").value.trim();
       if (!title) return;
       if (editingLogId) {
         await fetch(`${API}/logs/${editingLogId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title, memo, memo2, subcategory_id: currentSubcategoryId })
+          body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId })
         });
       } else {
         await fetch(`${API}/logs`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title, memo, memo2, subcategory_id: currentSubcategoryId })
-        });
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId })
+         });
       }
       closeLogModal();
       loadLogs(currentSubcategoryId, document.getElementById("subcategory-name").textContent.replace("・", ""));

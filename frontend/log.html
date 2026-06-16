@@ -5,30 +5,16 @@
   <title>StudyLog - ログ詳細</title>
   <style>
     body { margin: 0; font-family: sans-serif; }
-
     header { background: #ccc; padding: 12px 16px; display: flex; align-items: center; gap: 16px; }
     .header-title { font-size: 18px; font-weight: bold; flex: 1; }
     .header-meta { font-size: 13px; color: #444; }
     .header-brand { font-size: 13px; color: #888; }
     .home-btn { padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; }
-
     .breadcrumb { font-size: 13px; color: #444; background: #e8e8e8; padding: 8px 16px; }
     .layout { display: flex; height: calc(100vh - 90px); position: relative; }
 
     /* スライドサイドバー */
-    .slide-sidebar {
-      position: absolute;
-      top: 0; left: 0;
-      width: 180px;
-      height: 100%;
-      background: #ccc;
-      padding: 16px;
-      box-sizing: border-box;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 50;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-    }
+    .slide-sidebar { position: absolute; top: 0; left: 0; width: 180px; height: 100%; background: #ccc; padding: 16px; box-sizing: border-box; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; box-shadow: 2px 0 8px rgba(0,0,0,0.2); }
     .slide-sidebar.open { transform: translateX(0); }
     .slide-sidebar h3 { margin: 0 0 16px; font-size: 15px; }
     .slide-sidebar ul { list-style: none; padding: 0; }
@@ -36,17 +22,19 @@
     .slide-sidebar ul li:hover { font-weight: bold; }
 
     /* 不明点サイドバー */
-    .sidebar { width: 180px; background: #ddd; padding: 16px; border-right: 1px solid #ccc; flex-shrink: 0; }
+    .sidebar { width: 180px; background: #ddd; padding: 16px; border-right: 1px solid #ccc; flex-shrink: 0; display: flex; flex-direction: column; }
     .menu-btn { background: #eee; border: 1px solid #ccc; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 16px; margin-bottom: 16px; display: block; }
-    .sidebar h3 { margin: 0 0 12px; font-size: 15px; }
-    .sidebar ul { list-style: none; padding: 0; }
-    .sidebar ul li { font-size: 13px; margin-bottom: 10px; }
+    .sidebar h3 { margin: 0 0 8px; font-size: 15px; }
+    .sidebar textarea { flex: 1; width: 100%; padding: 8px; font-size: 13px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; resize: none; background: #f5f5f5; }
+    .sidebar-save-btn { margin-top: 8px; padding: 4px 10px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
     /* メインエリア */
     .main { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .title-box { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; font-size: 18px; font-weight: bold; text-align: center; }
-    .memo-box { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 16px; background: #f0f0f0; font-size: 15px; line-height: 1.8; }
-    .memo-box h4 { margin: 0 0 12px; font-size: 15px; text-align: center; }
+    .memo-box { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 16px; background: #f0f0f0; display: flex; flex-direction: column; }
+    .memo-box h4 { margin: 0 0 8px; font-size: 15px; text-align: center; }
+    .memo-box textarea { flex: 1; width: 100%; padding: 8px; font-size: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; resize: none; background: white; line-height: 1.8; }
+    .memo-save-btn { margin-top: 8px; padding: 6px 16px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; align-self: flex-end; }
 
     /* オーバーレイ */
     .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; }
@@ -63,8 +51,6 @@
   <div class="breadcrumb" id="breadcrumb"></div>
 
   <div class="layout">
-
-    <!-- スライドサイドバー -->
     <div class="slide-sidebar" id="slide-sidebar">
       <h3>カテゴリ一覧</h3>
       <ul id="slide-category-list"></ul>
@@ -75,7 +61,8 @@
     <div class="sidebar">
       <button class="menu-btn" onclick="toggleSidebar()">…</button>
       <h3>不明点</h3>
-      <ul id="memo2-list"></ul>
+      <textarea id="memo2-input" placeholder="不明点を入力..."></textarea>
+      <button class="sidebar-save-btn" onclick="saveMemo()">保存</button>
     </div>
 
     <!-- メインエリア -->
@@ -83,36 +70,45 @@
       <div class="title-box" id="title-box"></div>
       <div class="memo-box">
         <h4>メモ</h4>
-        <div id="memo-content"></div>
+        <textarea id="memo-input" placeholder="メモを入力..."></textarea>
+        <button class="memo-save-btn" onclick="saveMemo()">保存</button>
       </div>
     </div>
   </div>
 
   <script>
     const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
-   ? "http://127.0.0.1:8000"
-   : window.location.origin;
+      ? "http://127.0.0.1:8000"
+      : window.location.origin;
     const params = new URLSearchParams(location.search);
     const logId = params.get("log_id");
+    let currentLog = null;
 
     async function loadLog() {
       const res = await fetch(`${API}/logs/detail/${logId}`);
-      const log = await res.json();
-      document.getElementById("header-title").textContent = `・${log.title}`;
-      document.getElementById("header-meta").textContent = log.created_at ? log.created_at.slice(0, 10) : "";
-      document.getElementById("breadcrumb").textContent = log.title;
-      document.getElementById("title-box").textContent = `学習内容　${log.title}`;
-      document.getElementById("memo-content").textContent = log.memo || "";
-      const ul = document.getElementById("memo2-list");
-      if (log.memo2) {
-        log.memo2.split("\n").forEach(line => {
-          if (line.trim()) {
-            const li = document.createElement("li");
-            li.textContent = `・${line}`;
-            ul.appendChild(li);
-          }
-        });
-      }
+      currentLog = await res.json();
+      document.getElementById("header-title").textContent = `・${currentLog.title}`;
+      document.getElementById("header-meta").textContent = currentLog.created_at ? currentLog.created_at.slice(0, 10) : "";
+      document.getElementById("breadcrumb").textContent = currentLog.title;
+      document.getElementById("title-box").textContent = `学習内容　${currentLog.title}`;
+      document.getElementById("memo-input").value = currentLog.memo || "";
+      document.getElementById("memo2-input").value = currentLog.memo2 || "";
+    }
+
+    async function saveMemo() {
+      const memo = document.getElementById("memo-input").value;
+      const memo2 = document.getElementById("memo2-input").value;
+      await fetch(`${API}/logs/${logId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: currentLog.title,
+          memo: memo,
+          memo2: memo2,
+          subcategory_id: currentLog.subcategory_id
+        })
+      });
+      alert("保存しました");
     }
 
     async function loadSlideCategories() {
@@ -122,9 +118,7 @@
       categories.forEach(cat => {
         const li = document.createElement("li");
         li.textContent = `・${cat.name}`;
-        li.onclick = () => {
-          location.href = `category.html?category_id=${cat.id}&category_name=${cat.name}`;
-        };
+        li.onclick = () => location.href = `category.html?category_id=${cat.id}&category_name=${cat.name}`;
         ul.appendChild(li);
       });
     }
