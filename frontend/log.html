@@ -44,7 +44,6 @@
 <body>
   <header>
     <button class="menu-btn" onclick="toggleSidebar()">☰ メニュー</button>
-    <button class="home-btn" onclick="location.href='index.html'">⌂ ホーム</button>
     <div class="header-title" id="header-title"></div>
     <div class="header-meta" id="header-meta"></div>
     <div class="header-brand">StudyLog</div>
@@ -52,10 +51,10 @@
 
   <div class="layout">
     <div class="slide-sidebar" id="slide-sidebar">
+      <button class="home-btn" onclick="location.href='index.html'" style="width:100%; margin-bottom:16px; padding:8px; background:#eee; border:1px solid #aaa; border-radius:6px; cursor:pointer; font-size:13px;">⌂ ホーム</button>
       <h3>カテゴリ一覧</h3>
       <ul id="slide-category-list"></ul>
     </div>
-    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
     <!-- 不明点サイドバー -->
     <div class="sidebar">
