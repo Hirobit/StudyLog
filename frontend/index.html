@@ -82,8 +82,8 @@
             <button class="cat-menu-btn" onclick="toggleDropdown(event, 'dropdown-${cat.id}')">···</button>
           </div>
           <div class="cat-dropdown" id="dropdown-${cat.id}">
-            <button onclick="openEditModal(${cat.id}, '${cat.name}')">✏️ 編集</button>
-            <button class="del" onclick="deleteCategory(${cat.id})">🗑 削除</button>
+            <button onclick="openEditModal(${cat.id}, '${cat.name}')"> 編集</button>
+            <button class="del" onclick="deleteCategory(${cat.id})"> 削除</button>
           </div>
         `;
         ul.appendChild(li);
