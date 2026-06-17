@@ -5,31 +5,59 @@
   <title>StudyLog</title>
   <style>
     body { margin: 0; font-family: sans-serif; }
-    header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; }
+    header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; position: relative; }
+    .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; }
     .layout { display: flex; height: calc(100vh - 60px); }
+
+    /* カテゴリサイドバー */
     .sidebar-cat { width: 120px; background: #ddd; padding: 16px; }
     .sidebar-cat h2 { margin: 0 0 16px; font-size: 16px; }
-    .sidebar-cat ul { list-style: none; padding: 0; }
-    .sidebar-cat ul li { margin: 8px 0; cursor: pointer; font-size: 14px; }
-    .sidebar-cat ul li.active { font-weight: bold; background: #bbb; padding: 4px; border-radius: 4px; }
+    .sidebar-cat ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar-cat ul li { padding: 6px 8px; margin: 4px 0; cursor: pointer; font-size: 14px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-cat ul li:hover { background: #ccc; }
+    .sidebar-cat ul li.active { font-weight: bold; background: #bbb; }
+
+    /* サブカテゴリサイドバー */
     .sidebar-sub { width: 160px; background: #e8e8e8; padding: 16px; border-left: 1px solid #ccc; }
     .sidebar-sub h2 { margin: 0 0 8px; font-size: 16px; }
-    .sidebar-sub ul { list-style: none; padding: 0; }
-    .sidebar-sub ul li { margin: 8px 0; font-size: 14px; }
-    .sub-name { cursor: pointer; }
-    .sub-name:hover { font-weight: bold; }
-    .btn-small { padding: 2px 6px; font-size: 11px; cursor: pointer; border: 1px solid #aaa; border-radius: 4px; background: #eee; }
-    .btn-small.del { background: #fdd; }
+    .sidebar-sub ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar-sub ul li { position: relative; margin: 4px 0; }
+
+    .sub-row { display: flex; align-items: center; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+    .sub-row:hover { background: #ddd; }
+    .sub-name { flex: 1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sub-menu-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 14px; color: #666; padding: 0 4px; border-radius: 4px; }
+    .sub-menu-btn:hover { background: #ccc; }
+
+    .sub-dropdown { display: none; position: absolute; left: 0; top: 100%; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 120px; overflow: hidden; }
+    .sub-dropdown.open { display: block; }
+    .sub-dropdown button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: 13px; }
+    .sub-dropdown button:hover { background: #f5f5f5; }
+    .sub-dropdown button.del { color: #e53e3e; }
+
     .add-btn { margin-top: 12px; padding: 4px 10px; background: #555; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+    /* メインエリア */
     .main { flex: 1; padding: 24px; }
     .main h2 { margin: 0 0 16px; font-size: 20px; }
-    .log-item { border: 1px solid #ccc; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .log-name { flex: 1; cursor: pointer; }
+    .log-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .log-item:hover { background: #fafafa; }
+    .log-name { flex: 1; cursor: pointer; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .log-name:hover { font-weight: bold; }
+
+    .log-menu-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 14px; color: #666; padding: 0 4px; border-radius: 4px; }
+    .log-menu-btn:hover { background: #eee; }
+    .log-dropdown { display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 120px; overflow: hidden; }
+    .log-dropdown.open { display: block; }
+    .log-dropdown button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: 13px; }
+    .log-dropdown button:hover { background: #f5f5f5; }
+    .log-dropdown button.del { color: #e53e3e; }
+    .log-item-wrap { position: relative; }
+
     .add-log-btn { margin-top: 16px; padding: 8px 16px; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 
     /* モーダル */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; }
     .modal { background: white; width: 320px; margin: 200px auto; padding: 24px; border-radius: 8px; }
     .modal h3 { margin: 0 0 16px; }
     .modal input { width: 100%; padding: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; }
@@ -41,11 +69,9 @@
 </head>
 <body>
   <header>
-  <div style="position:absolute; left:16px; top:12px;">
-    <button onclick="location.href='index.html'" style="padding:6px 12px; background:#eee; border:1px solid #aaa; border-radius:6px; cursor:pointer; font-size:13px;">← 戻る</button>
-  </div>
-  StudyLog
-</header>
+    <button class="back-btn" onclick="location.href='index.html'">← 戻る</button>
+    StudyLog
+  </header>
   <div class="layout">
     <div class="sidebar-cat">
       <h2>Log</h2>
@@ -89,16 +115,34 @@
 
   <script>
     const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
-   ? "http://127.0.0.1:8000"
-   : window.location.origin;
+      ? "http://127.0.0.1:8000"
+      : window.location.origin;
     const params = new URLSearchParams(location.search);
     const categoryId = params.get("category_id");
-    const categoryName = params.get("category_name");
+    const categoryName = decodeURIComponent(params.get("category_name") || "");
     let editingSubId = null;
     let editingLogId = null;
     let currentSubcategoryId = null;
+    let openDropdown = null;
 
     document.getElementById("category-name").textContent = categoryName;
+
+    document.addEventListener("click", () => {
+      if (openDropdown) {
+        openDropdown.classList.remove("open");
+        openDropdown = null;
+      }
+    });
+
+    function toggleDropdown(e, id) {
+      e.stopPropagation();
+      const dropdown = document.getElementById(id);
+      if (openDropdown && openDropdown !== dropdown) {
+        openDropdown.classList.remove("open");
+      }
+      dropdown.classList.toggle("open");
+      openDropdown = dropdown.classList.contains("open") ? dropdown : null;
+    }
 
     async function loadCategories() {
       const res = await fetch(`${API}/categories`);
@@ -109,7 +153,7 @@
         const li = document.createElement("li");
         li.textContent = `・${cat.name}`;
         if (String(cat.id) === categoryId) li.classList.add("active");
-        li.onclick = () => location.href = `category.html?category_id=${cat.id}&category_name=${cat.name}`;
+        li.onclick = () => location.href = `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`;
         ul.appendChild(li);
       });
     }
@@ -122,9 +166,14 @@
       subcategories.forEach(sub => {
         const li = document.createElement("li");
         li.innerHTML = `
-          <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}')">・${sub.name}</span><br>
-          <button class="btn-small" onclick="openSubEditModal(${sub.id}, '${sub.name}')">編集</button>
-          <button class="btn-small del" onclick="deleteSubcategory(${sub.id})">削除</button>
+          <div class="sub-row">
+            <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}')">・${sub.name}</span>
+            <button class="sub-menu-btn" onclick="toggleDropdown(event, 'sub-dropdown-${sub.id}')">···</button>
+          </div>
+          <div class="sub-dropdown" id="sub-dropdown-${sub.id}">
+            <button onclick="openSubEditModal(${sub.id}, '${sub.name}')">編集</button>
+            <button class="del" onclick="deleteSubcategory(${sub.id})">削除</button>
+          </div>
         `;
         ul.appendChild(li);
       });
@@ -139,14 +188,19 @@
       const div = document.getElementById("log-list");
       div.innerHTML = "";
       logs.forEach(log => {
-        const item = document.createElement("div");
-        item.className = "log-item";
-        item.innerHTML = `
-          <span class="log-name" onclick="location.href='log.html?log_id=${log.id}'">・${log.created_at ? log.created_at.slice(0,10) : ""} / ${log.title}</span>
-          <button class="btn-small" onclick="openLogEditModal(${log.id}, '${log.title}', '${log.memo || ''}', '${log.memo2 || ''}')">編集</button>
-          <button class="btn-small del" onclick="deleteLog(${log.id}, ${subcategoryId}, '${subcategoryName}')">削除</button>
+        const wrap = document.createElement("div");
+        wrap.className = "log-item-wrap";
+        wrap.innerHTML = `
+          <div class="log-item">
+            <span class="log-name" onclick="location.href='log.html?log_id=${log.id}'">・${log.created_at ? log.created_at.slice(0,10) : ""} / ${log.title}</span>
+            <button class="log-menu-btn" onclick="toggleDropdown(event, 'log-dropdown-${log.id}')">···</button>
+          </div>
+          <div class="log-dropdown" id="log-dropdown-${log.id}">
+            <button onclick="openLogEditModal(${log.id}, '${log.title}')">編集</button>
+            <button class="del" onclick="deleteLog(${log.id}, ${subcategoryId}, '${subcategoryName}')">削除</button>
+          </div>
         `;
-        div.appendChild(item);
+        div.appendChild(wrap);
       });
     }
 
@@ -206,7 +260,7 @@
       document.getElementById("log-modal").style.display = "block";
     }
 
-    function openLogEditModal(id, title, memo, memo2) {
+    function openLogEditModal(id, title) {
       editingLogId = id;
       document.getElementById("log-modal-title").textContent = "タイトル編集";
       document.getElementById("log-title-input").value = title;
@@ -228,10 +282,10 @@
         });
       } else {
         await fetch(`${API}/logs`, {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId })
-         });
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId })
+        });
       }
       closeLogModal();
       loadLogs(currentSubcategoryId, document.getElementById("subcategory-name").textContent.replace("・", ""));
