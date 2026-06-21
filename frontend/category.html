@@ -87,7 +87,7 @@
     .mobile-back { display: block; padding: 10px 16px; background: #eee; border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: left; font-size: 14px; cursor: pointer; }
     }
 
-    @media (min-width: 769px) {
+    @media (min-width: 1025px) {
     .mobile-back { display: none; }
     .sidebar-sub { display: block !important; }
     .main { display: block !important; }
@@ -335,9 +335,17 @@
     }
 
     loadCategories();
-    loadSubcategories();
+    if (categoryId) {
+      loadSubcategories();
+    } else if (isMobile()) {
+      showCategories();
+    }
 
     // スマホ用画面切り替え
+    function isMobile() {
+      return window.innerWidth <= 1024;
+    }
+    
     function showSubcategories() {
       if (!isMobile()) return;
       document.querySelector('.sidebar-cat').style.display = 'none';
