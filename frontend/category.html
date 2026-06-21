@@ -8,7 +8,6 @@
     body { margin: 0; font-family: sans-serif; }
     header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; position: relative; }
     .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; }
-    .mobile-back { display: none; padding: 10px 16px; background: #eee; border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: left; font-size: 14px; cursor: pointer; box-sizing: border-box; }
 
     .layout { display: flex; height: calc(100vh - 60px); }
     .sidebar-cat { width: 120px; background: #ddd; padding: 16px; flex-shrink: 0; }
@@ -86,7 +85,6 @@
     <button class="back-btn" onclick="location.href='index.html'">← 戻る</button>
     StudyLog
   </header>
-  <button class="mobile-back" id="mobile-back-btn" onclick="showPanel('cat')" style="display:none;">← カテゴリ一覧に戻る</button>
 
   <div class="layout">
     <div class="sidebar-cat" id="panel-cat">
@@ -143,7 +141,6 @@
 
     function showPanel(panel) {
       document.body.className = panel === "cat" ? "" : `show-${panel}`;
-      document.getElementById("mobile-back-btn").style.display = panel === "cat" ? "none" : "block";
     }
 
     // カテゴリIDがあればサブパネルを表示
