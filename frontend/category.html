@@ -65,6 +65,32 @@
     .modal-buttons button { padding: 6px 16px; border: none; border-radius: 4px; cursor: pointer; }
     .btn-save { background: #555; color: white; }
     .btn-cancel { background: #eee; }
+
+    /* スマホ対応 */
+    @media (max-width: 768px) {
+    .layout { flex-direction: column; height: auto; }
+
+    .sidebar-cat { width: 100%; box-sizing: border-box; }
+    .sidebar-sub { width: 100%; box-sizing: border-box; border-left: none; border-top: 1px solid #ccc; display: none; }
+    .main { display: none; padding: 16px; }
+
+    .sidebar-cat ul li { font-size: 16px; }
+    .sub-row { padding: 10px 8px; }
+    .sub-name { font-size: 15px; }
+    .log-item { padding: 12px; }
+    .log-name { font-size: 14px; }
+
+    .add-btn { width: 100%; padding: 10px; font-size: 14px; }
+    .add-log-btn { width: 100%; padding: 12px; font-size: 15px; }
+
+    .mobile-back { display: block; padding: 10px 16px; background: #eee; border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: left; font-size: 14px; cursor: pointer; }
+    }
+
+    @media (min-width: 769px) {
+    .mobile-back { display: none; }
+    .sidebar-sub { display: block !important; }
+    .main { display: block !important; }
+    }
   </style>
 </head>
 <body>
@@ -73,6 +99,7 @@
     StudyLog
   </header>
   <div class="layout">
+    <button class="mobile-back" id="mobile-back-btn" onclick="showCategories()" style="display:none;">← カテゴリ一覧に戻る</button>
     <div class="sidebar-cat">
       <h2>Log</h2>
       <ul id="category-list"></ul>
@@ -153,7 +180,15 @@
         const li = document.createElement("li");
         li.textContent = `・${cat.name}`;
         if (String(cat.id) === categoryId) li.classList.add("active");
-        li.onclick = () => location.href = `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`;
+        li.onclick = () => {
+          if (isMobile()) {
+          // スマホ：URLパラメータを更新してサブカテゴリ画面に切り替え
+          history.pushState({}, '', `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`);
+          location.reload();
+        } else {
+          location.href = `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`;
+        }
+      };
         ul.appendChild(li);
       });
     }
@@ -167,7 +202,7 @@
         const li = document.createElement("li");
         li.innerHTML = `
           <div class="sub-row">
-            <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}')">・${sub.name}</span>
+            <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}'); showLogs();">・${sub.name}</span>
             <button class="sub-menu-btn" onclick="toggleDropdown(event, 'sub-dropdown-${sub.id}')">···</button>
           </div>
           <div class="sub-dropdown" id="sub-dropdown-${sub.id}">
@@ -177,6 +212,7 @@
         `;
         ul.appendChild(li);
       });
+      if (isMobile() && categoryId) showSubcategories();
     }
 
     async function loadLogs(subcategoryId, subcategoryName) {
@@ -299,6 +335,31 @@
 
     loadCategories();
     loadSubcategories();
+
+    // スマホ用画面切り替え
+    function showSubcategories() {
+      if (!isMobile()) return;
+      document.querySelector('.sidebar-cat').style.display = 'none';
+      document.querySelector('.sidebar-sub').style.display = 'block';
+      document.querySelector('.main').style.display = 'none';
+      document.getElementById('mobile-back-btn').style.display = 'block';
+    }
+
+    function showLogs() {
+      if (!isMobile()) return;
+      document.querySelector('.sidebar-cat').style.display = 'none';
+      document.querySelector('.sidebar-sub').style.display = 'none';
+      document.querySelector('.main').style.display = 'block';
+      document.getElementById('mobile-back-btn').style.display = 'block';
+    }
+
+    function showCategories() {
+      if (!isMobile()) return;
+      document.querySelector('.sidebar-cat').style.display = 'block';
+      document.querySelector('.sidebar-sub').style.display = 'none';
+      document.querySelector('.main').style.display = 'none';
+      document.getElementById('mobile-back-btn').style.display = 'none';
+    }
   </script>
 </body>
 </html>
