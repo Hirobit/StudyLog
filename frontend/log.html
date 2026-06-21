@@ -5,93 +5,91 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyLog - ログ詳細</title>
   <style>
-    body { margin: 0; font-family: sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; }
 
     /* ヘッダー */
-    header { background: #ccc; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
-    .header-title { font-size: 18px; font-weight: bold; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .header-meta { font-size: 13px; color: #444; white-space: nowrap; }
-    .header-brand { font-size: 13px; color: #888; white-space: nowrap; }
-    .menu-btn { flex-shrink: 0; padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap; }
-
-    .layout { display: flex; height: calc(100vh - 50px); position: relative; }
+    header { background: #ccc; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+    .menu-btn { padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+    .header-meta { font-size: 13px; color: #444; flex: 1; }
+    .header-brand { font-size: 13px; color: #888; }
 
     /* スライドサイドバー */
-    .slide-sidebar { position: absolute; top: 0; left: 0; width: 180px; height: 100%; background: #ccc; padding: 16px; box-sizing: border-box; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; box-shadow: 2px 0 8px rgba(0,0,0,0.2); }
+    .slide-sidebar { position: fixed; top: 0; left: 0; width: 200px; height: 100%; background: #ccc; padding: 16px; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 100; box-shadow: 2px 0 8px rgba(0,0,0,0.2); }
     .slide-sidebar.open { transform: translateX(0); }
+    .slide-sidebar .home-btn { display: block; width: 100%; padding: 10px; margin-bottom: 16px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 14px; text-align: center; }
     .slide-sidebar h3 { margin: 0 0 12px; font-size: 15px; }
-    .slide-sidebar .home-btn { display: block; width: 100%; padding: 10px; margin-bottom: 16px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 14px; box-sizing: border-box; text-align: center; }
     .slide-sidebar ul { list-style: none; padding: 0; }
     .slide-sidebar ul li { margin: 10px 0; font-size: 14px; cursor: pointer; }
     .slide-sidebar ul li:hover { font-weight: bold; }
-
-    /* 不明点サイドバー */
-    .sidebar { width: 180px; background: #ddd; padding: 16px; border-right: 1px solid #ccc; flex-shrink: 0; display: flex; flex-direction: column; }
-    .sidebar h3 { margin: 0 0 8px; font-size: 15px; text-align: center; }
-    .sidebar textarea { flex: 1; width: 100%; padding: 8px; font-size: 13px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; resize: none; background: #f5f5f5; }
-
-    /* メインエリア */
-    .main { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-    .title-box { border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; font-size: 18px; font-weight: bold; text-align: center; }
-    .memo-box { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 16px; background: #f0f0f0; display: flex; flex-direction: column; gap: 8px; }
-    .memo-box h4 { margin: 0; font-size: 15px; text-align: center; }
-    .memo-box textarea { flex: 1; width: 100%; padding: 8px; font-size: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; resize: none; background: white; line-height: 1.8; }
-    .save-btn { align-self: flex-end; padding: 10px 28px; background: #444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
-    .save-btn:hover { background: #222; }
-
-    /* オーバーレイ */
-    .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; }
+    .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 90; background: rgba(0,0,0,0.2); }
     .overlay.open { display: block; }
 
-    /* スマホ対応 */
-  @media (max-width: 1024px) {
-    header { flex-wrap: wrap; padding: 10px 14px; gap: 8px; }
-    .menu-btn { padding: 7px 14px; font-size: 14px; order: 1; }
-    .header-title { font-size: 15px; order: 2; flex: 1; }
-    .header-meta { font-size: 12px; order: 3; width: 100%; color: #555; padding-right: 2px; }
-    .header-brand { font-size: 12px; order: 4; color: #888; }
+    /* コンテンツ */
+    .content { max-width: 800px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-    .layout { flex-direction: column; height: auto; min-height: calc(100vh - 70px); }
+    /* タイトルボックス */
+    .title-box { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px 16px; font-size: 17px; font-weight: bold; text-align: center; }
 
-    .sidebar { width: 100%; box-sizing: border-box; border-right: none; border-top: 1px solid #ccc; order: 2; }
-    .sidebar h3 { font-size: 15px; }
-    .sidebar textarea { height: 100px; font-size: 14px; }
+    /* セクション */
+    .section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+    .section-header { background: #e8e8e8; padding: 10px 16px; font-size: 15px; font-weight: bold; text-align: center; border-bottom: 1px solid #ddd; }
+    .section-body { padding: 12px; }
+    .section textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px; font-size: 15px; line-height: 1.7; resize: none; background: #fafafa; font-family: sans-serif; }
+    .section-footer { padding: 8px 12px 12px; display: flex; justify-content: flex-end; }
+    .save-btn { padding: 8px 24px; background: #444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+    .save-btn:hover { background: #222; }
 
-    .main { order: 1; padding: 16px; gap: 12px; }
-    .title-box { font-size: 16px; padding: 12px; }
-    .memo-box h4 { font-size: 15px; }
-    .memo-box textarea { font-size: 15px; min-height: 220px; line-height: 1.8; }
-    .save-btn { align-self: flex-end; padding: 10px 28px; font-size: 15px; margin-bottom: 16px; }
-  }
+    /* PCレイアウト */
+    @media (min-width: 1025px) {
+      header { padding: 12px 16px; }
+      .menu-btn { font-size: 13px; }
+      .content { flex-direction: row; flex-wrap: wrap; padding: 24px; gap: 16px; }
+      .title-box { width: 100%; font-size: 18px; }
+      .section.memo { flex: 2; }
+      .section.memo2 { flex: 1; min-width: 180px; }
+      .section textarea { min-height: 400px; }
+    }
+
+    /* スマホ */
+    @media (max-width: 1024px) {
+      .section textarea { min-height: 180px; font-size: 15px; }
+      .section.memo2 .section-body textarea { min-height: 100px; }
+    }
   </style>
 </head>
 <body>
+  <!-- スライドサイドバー -->
+  <div class="slide-sidebar" id="slide-sidebar">
+    <button class="home-btn" onclick="location.href='index.html'">⌂ ホーム</button>
+    <h3>カテゴリ一覧</h3>
+    <ul id="slide-category-list"></ul>
+  </div>
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
   <header>
     <button class="menu-btn" onclick="toggleSidebar()">☰ メニュー</button>
-    <div class="header-title" id="header-title"></div>
     <div class="header-meta" id="header-meta"></div>
     <div class="header-brand">StudyLog</div>
   </header>
 
-  <div class="layout">
-    <div class="slide-sidebar" id="slide-sidebar">
-      <button class="home-btn" onclick="location.href='index.html'">⌂ ホーム</button>
-      <h3>カテゴリ一覧</h3>
-      <ul id="slide-category-list"></ul>
-    </div>
-    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+  <div class="content">
+    <div class="title-box" id="title-box"></div>
 
-    <div class="sidebar">
-      <h3>不明点</h3>
-      <textarea id="memo2-input" placeholder="不明点を入力..."></textarea>
-    </div>
-
-    <div class="main">
-      <div class="title-box" id="title-box"></div>
-      <div class="memo-box">
-        <h4>メモ</h4>
+    <div class="section memo">
+      <div class="section-header">メモ</div>
+      <div class="section-body">
         <textarea id="memo-input" placeholder="メモを入力..."></textarea>
+      </div>
+      <div class="section-footer">
         <button class="save-btn" onclick="saveMemo()">保存</button>
+      </div>
+    </div>
+
+    <div class="section memo2">
+      <div class="section-header">不明点</div>
+      <div class="section-body">
+        <textarea id="memo2-input" placeholder="不明点を入力..."></textarea>
       </div>
     </div>
   </div>
@@ -107,7 +105,6 @@
     async function loadLog() {
       const res = await fetch(`${API}/logs/detail/${logId}`);
       currentLog = await res.json();
-      document.getElementById("header-title").textContent = `・${currentLog.title}`;
       document.getElementById("header-meta").textContent = currentLog.created_at ? currentLog.created_at.slice(0, 10) : "";
       document.getElementById("title-box").textContent = `学習内容　${currentLog.title}`;
       document.getElementById("memo-input").value = currentLog.memo || "";
