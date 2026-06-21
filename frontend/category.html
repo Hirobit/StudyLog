@@ -10,7 +10,6 @@
     .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; }
     .mobile-back { display: none; padding: 10px 16px; background: #eee; border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: left; font-size: 14px; cursor: pointer; box-sizing: border-box; }
 
-    /* デスクトップレイアウト */
     .layout { display: flex; height: calc(100vh - 60px); }
     .sidebar-cat { width: 120px; background: #ddd; padding: 16px; flex-shrink: 0; }
     .sidebar-cat h2 { margin: 0 0 16px; font-size: 16px; }
@@ -38,9 +37,7 @@
     .log-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .log-item:hover { background: #fafafa; }
     .log-name { flex: 1; cursor: pointer; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .log-name:hover { font-weight: bold; }
     .log-menu-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 14px; color: #666; padding: 0 4px; border-radius: 4px; }
-    .log-menu-btn:hover { background: #eee; }
     .log-dropdown { display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 120px; overflow: hidden; }
     .log-dropdown.open { display: block; }
     .log-dropdown button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: 13px; }
@@ -49,7 +46,6 @@
     .log-item-wrap { position: relative; }
     .add-log-btn { margin-top: 16px; padding: 8px 16px; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 
-    /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; }
     .modal { background: white; width: 320px; margin: 200px auto; padding: 24px; border-radius: 8px; }
     .modal h3 { margin: 0 0 16px; }
@@ -59,20 +55,29 @@
     .btn-save { background: #555; color: white; }
     .btn-cancel { background: #eee; }
 
-    /* スマホレイアウト */
+    /* スマホ：デフォルトはカテゴリパネルのみ表示 */
     @media (max-width: 1024px) {
+      .mobile-back { display: block; }
       .layout { flex-direction: column; height: auto; }
       .sidebar-cat { width: 100%; box-sizing: border-box; }
+      .sidebar-sub { width: 100%; box-sizing: border-box; border-left: none; border-top: 1px solid #ccc; display: none; }
+      .main { display: none; padding: 16px; }
       .sidebar-cat ul li { font-size: 16px; padding: 12px 8px; border-bottom: 1px solid #ccc; }
-      .sidebar-sub { width: 100%; box-sizing: border-box; border-left: none; border-top: 1px solid #ccc; }
       .sub-row { padding: 12px 8px; }
       .sub-name { font-size: 15px; }
-      .main { padding: 16px; }
       .log-item { padding: 12px; }
-      .log-name { font-size: 15px; }
       .add-btn { width: 100%; padding: 12px; font-size: 15px; margin-top: 8px; }
       .add-log-btn { width: 100%; padding: 12px; font-size: 15px; }
-      .mobile-back { display: block; }
+
+      /* サブパネル表示 */
+      body.show-sub .sidebar-cat { display: none; }
+      body.show-sub .sidebar-sub { display: block; }
+      body.show-sub .main { display: none; }
+
+      /* メインパネル表示 */
+      body.show-main .sidebar-cat { display: none; }
+      body.show-main .sidebar-sub { display: none; }
+      body.show-main .main { display: block; }
     }
   </style>
 </head>
@@ -136,21 +141,13 @@
 
     document.getElementById("category-name").textContent = categoryName;
 
-    function isMobile() {
-      return window.innerWidth <= 1024;
+    function showPanel(panel) {
+      document.body.className = panel === "cat" ? "" : `show-${panel}`;
+      document.getElementById("mobile-back-btn").style.display = panel === "cat" ? "none" : "block";
     }
 
-    function showPanel(panel) {
-      if (!isMobile()) return;
-      const cat = document.getElementById("panel-cat");
-      const sub = document.getElementById("panel-sub");
-      const main = document.getElementById("panel-main");
-      const backBtn = document.getElementById("mobile-back-btn");
-      cat.style.display = panel === "cat" ? "block" : "none";
-      sub.style.display = panel === "sub" ? "block" : "none";
-      main.style.display = panel === "main" ? "block" : "none";
-      backBtn.style.display = panel === "cat" ? "none" : "block";
-    }
+    // カテゴリIDがあればサブパネルを表示
+    if (categoryId) showPanel("sub");
 
     document.addEventListener("click", () => {
       if (openDropdown) { openDropdown.classList.remove("open"); openDropdown = null; }
@@ -198,7 +195,6 @@
           </div>`;
         ul.appendChild(li);
       });
-      if (isMobile() && categoryId) showPanel("sub");
     }
 
     async function loadLogs(subcategoryId, subcategoryName) {
@@ -293,9 +289,7 @@
     }
 
     loadCategories();
-    if (categoryId) {
-      loadSubcategories();
-    }
+    if (categoryId) loadSubcategories();
   </script>
 </body>
 </html>
