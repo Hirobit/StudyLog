@@ -8,44 +8,37 @@
     body { margin: 0; font-family: sans-serif; }
     header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; position: relative; }
     .back-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; }
-    .layout { display: flex; height: calc(100vh - 60px); }
+    .mobile-back { display: none; padding: 10px 16px; background: #eee; border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: left; font-size: 14px; cursor: pointer; box-sizing: border-box; }
 
-    /* カテゴリサイドバー */
-    .sidebar-cat { width: 120px; background: #ddd; padding: 16px; }
+    /* デスクトップレイアウト */
+    .layout { display: flex; height: calc(100vh - 60px); }
+    .sidebar-cat { width: 120px; background: #ddd; padding: 16px; flex-shrink: 0; }
     .sidebar-cat h2 { margin: 0 0 16px; font-size: 16px; }
     .sidebar-cat ul { list-style: none; padding: 0; margin: 0; }
     .sidebar-cat ul li { padding: 6px 8px; margin: 4px 0; cursor: pointer; font-size: 14px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .sidebar-cat ul li:hover { background: #ccc; }
     .sidebar-cat ul li.active { font-weight: bold; background: #bbb; }
-
-    /* サブカテゴリサイドバー */
-    .sidebar-sub { width: 160px; background: #e8e8e8; padding: 16px; border-left: 1px solid #ccc; }
+    .sidebar-sub { width: 160px; background: #e8e8e8; padding: 16px; border-left: 1px solid #ccc; flex-shrink: 0; }
     .sidebar-sub h2 { margin: 0 0 8px; font-size: 16px; }
     .sidebar-sub ul { list-style: none; padding: 0; margin: 0; }
     .sidebar-sub ul li { position: relative; margin: 4px 0; }
-
     .sub-row { display: flex; align-items: center; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
     .sub-row:hover { background: #ddd; }
     .sub-name { flex: 1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .sub-menu-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 14px; color: #666; padding: 0 4px; border-radius: 4px; }
     .sub-menu-btn:hover { background: #ccc; }
-
     .sub-dropdown { display: none; position: absolute; left: 0; top: 100%; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 120px; overflow: hidden; }
     .sub-dropdown.open { display: block; }
     .sub-dropdown button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: 13px; }
     .sub-dropdown button:hover { background: #f5f5f5; }
     .sub-dropdown button.del { color: #e53e3e; }
-
     .add-btn { margin-top: 12px; padding: 4px 10px; background: #555; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
-
-    /* メインエリア */
     .main { flex: 1; padding: 24px; }
     .main h2 { margin: 0 0 16px; font-size: 20px; }
     .log-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .log-item:hover { background: #fafafa; }
     .log-name { flex: 1; cursor: pointer; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .log-name:hover { font-weight: bold; }
-
     .log-menu-btn { flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 14px; color: #666; padding: 0 4px; border-radius: 4px; }
     .log-menu-btn:hover { background: #eee; }
     .log-dropdown { display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 120px; overflow: hidden; }
@@ -54,7 +47,6 @@
     .log-dropdown button:hover { background: #f5f5f5; }
     .log-dropdown button.del { color: #e53e3e; }
     .log-item-wrap { position: relative; }
-
     .add-log-btn { margin-top: 16px; padding: 8px 16px; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 
     /* モーダル */
@@ -67,30 +59,20 @@
     .btn-save { background: #555; color: white; }
     .btn-cancel { background: #eee; }
 
-    /* スマホ対応 */
+    /* スマホレイアウト */
     @media (max-width: 1024px) {
-    .layout { flex-direction: column; height: auto; }
-
-    .sidebar-cat { width: 100%; box-sizing: border-box; }
-    .sidebar-sub { width: 100%; box-sizing: border-box; border-left: none; border-top: 1px solid #ccc; display: none; }
-    .main { display: none; padding: 16px; }
-
-    .sidebar-cat ul li { font-size: 16px; }
-    .sub-row { padding: 10px 8px; }
-    .sub-name { font-size: 15px; }
-    .log-item { padding: 12px; }
-    .log-name { font-size: 14px; }
-
-    .add-btn { width: 100%; padding: 10px; font-size: 14px; }
-    .add-log-btn { width: 100%; padding: 12px; font-size: 15px; }
-
-    .mobile-back { display: block; padding: 10px 16px; background: #eee; border: none; border-bottom: 1px solid #ccc; width: 100%; text-align: left; font-size: 14px; cursor: pointer; }
-    }
-
-    @media (min-width: 1025px) {
-    .mobile-back { display: none; }
-    .sidebar-sub { display: block !important; }
-    .main { display: block !important; }
+      .layout { flex-direction: column; height: auto; }
+      .sidebar-cat { width: 100%; box-sizing: border-box; }
+      .sidebar-cat ul li { font-size: 16px; padding: 12px 8px; border-bottom: 1px solid #ccc; }
+      .sidebar-sub { width: 100%; box-sizing: border-box; border-left: none; border-top: 1px solid #ccc; }
+      .sub-row { padding: 12px 8px; }
+      .sub-name { font-size: 15px; }
+      .main { padding: 16px; }
+      .log-item { padding: 12px; }
+      .log-name { font-size: 15px; }
+      .add-btn { width: 100%; padding: 12px; font-size: 15px; margin-top: 8px; }
+      .add-log-btn { width: 100%; padding: 12px; font-size: 15px; }
+      .mobile-back { display: block; }
     }
   </style>
 </head>
@@ -99,25 +81,25 @@
     <button class="back-btn" onclick="location.href='index.html'">← 戻る</button>
     StudyLog
   </header>
+  <button class="mobile-back" id="mobile-back-btn" onclick="showPanel('cat')" style="display:none;">← カテゴリ一覧に戻る</button>
+
   <div class="layout">
-    <button class="mobile-back" id="mobile-back-btn" onclick="showCategories()" style="display:none;">← カテゴリ一覧に戻る</button>
-    <div class="sidebar-cat">
+    <div class="sidebar-cat" id="panel-cat">
       <h2>Log</h2>
       <ul id="category-list"></ul>
     </div>
-    <div class="sidebar-sub">
+    <div class="sidebar-sub" id="panel-sub">
       <h2 id="category-name"></h2>
       <ul id="subcategory-list"></ul>
       <button class="add-btn" onclick="openSubModal()">＋ 追加</button>
     </div>
-    <div class="main">
+    <div class="main" id="panel-main">
       <h2 id="subcategory-name"></h2>
       <div id="log-list"></div>
       <button class="add-log-btn" id="add-log-btn" style="display:none" onclick="openLogModal()">＋ Log作成</button>
     </div>
   </div>
 
-  <!-- サブカテゴリモーダル -->
   <div class="modal-overlay" id="sub-modal">
     <div class="modal">
       <h3 id="sub-modal-title">サブカテゴリ追加</h3>
@@ -129,7 +111,6 @@
     </div>
   </div>
 
-  <!-- ログ作成モーダル -->
   <div class="modal-overlay" id="log-modal">
     <div class="modal">
       <h3 id="log-modal-title">ログ作成</h3>
@@ -155,19 +136,30 @@
 
     document.getElementById("category-name").textContent = categoryName;
 
+    function isMobile() {
+      return window.innerWidth <= 1024;
+    }
+
+    function showPanel(panel) {
+      if (!isMobile()) return;
+      const cat = document.getElementById("panel-cat");
+      const sub = document.getElementById("panel-sub");
+      const main = document.getElementById("panel-main");
+      const backBtn = document.getElementById("mobile-back-btn");
+      cat.style.display = panel === "cat" ? "block" : "none";
+      sub.style.display = panel === "sub" ? "block" : "none";
+      main.style.display = panel === "main" ? "block" : "none";
+      backBtn.style.display = panel === "cat" ? "none" : "block";
+    }
+
     document.addEventListener("click", () => {
-      if (openDropdown) {
-        openDropdown.classList.remove("open");
-        openDropdown = null;
-      }
+      if (openDropdown) { openDropdown.classList.remove("open"); openDropdown = null; }
     });
 
     function toggleDropdown(e, id) {
       e.stopPropagation();
       const dropdown = document.getElementById(id);
-      if (openDropdown && openDropdown !== dropdown) {
-        openDropdown.classList.remove("open");
-      }
+      if (openDropdown && openDropdown !== dropdown) openDropdown.classList.remove("open");
       dropdown.classList.toggle("open");
       openDropdown = dropdown.classList.contains("open") ? dropdown : null;
     }
@@ -182,14 +174,8 @@
         li.textContent = `・${cat.name}`;
         if (String(cat.id) === categoryId) li.classList.add("active");
         li.onclick = () => {
-          if (isMobile()) {
-          // スマホ：URLパラメータを更新してサブカテゴリ画面に切り替え
-          history.pushState({}, '', `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`);
-          location.reload();
-        } else {
           location.href = `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`;
-        }
-      };
+        };
         ul.appendChild(li);
       });
     }
@@ -203,17 +189,16 @@
         const li = document.createElement("li");
         li.innerHTML = `
           <div class="sub-row">
-            <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}'); showLogs();">・${sub.name}</span>
+            <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}'); showPanel('main');">・${sub.name}</span>
             <button class="sub-menu-btn" onclick="toggleDropdown(event, 'sub-dropdown-${sub.id}')">···</button>
           </div>
           <div class="sub-dropdown" id="sub-dropdown-${sub.id}">
             <button onclick="openSubEditModal(${sub.id}, '${sub.name}')">編集</button>
             <button class="del" onclick="deleteSubcategory(${sub.id})">削除</button>
-          </div>
-        `;
+          </div>`;
         ul.appendChild(li);
       });
-      if (isMobile() && categoryId) showSubcategories();
+      if (isMobile() && categoryId) showPanel("sub");
     }
 
     async function loadLogs(subcategoryId, subcategoryName) {
@@ -235,46 +220,32 @@
           <div class="log-dropdown" id="log-dropdown-${log.id}">
             <button onclick="openLogEditModal(${log.id}, '${log.title}')">編集</button>
             <button class="del" onclick="deleteLog(${log.id}, ${subcategoryId}, '${subcategoryName}')">削除</button>
-          </div>
-        `;
+          </div>`;
         div.appendChild(wrap);
       });
     }
 
-    // サブカテゴリモーダル
     function openSubModal() {
       editingSubId = null;
       document.getElementById("sub-modal-title").textContent = "サブカテゴリ追加";
       document.getElementById("sub-modal-input").value = "";
       document.getElementById("sub-modal").style.display = "block";
     }
-
     function openSubEditModal(id, name) {
       editingSubId = id;
       document.getElementById("sub-modal-title").textContent = "サブカテゴリ編集";
       document.getElementById("sub-modal-input").value = name;
       document.getElementById("sub-modal").style.display = "block";
     }
-
-    function closeSubModal() {
-      document.getElementById("sub-modal").style.display = "none";
-    }
+    function closeSubModal() { document.getElementById("sub-modal").style.display = "none"; }
 
     async function saveSubcategory() {
       const name = document.getElementById("sub-modal-input").value.trim();
       if (!name) return;
       if (editingSubId) {
-        await fetch(`${API}/subcategories/${editingSubId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, category_id: parseInt(categoryId) })
-        });
+        await fetch(`${API}/subcategories/${editingSubId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
       } else {
-        await fetch(`${API}/subcategories`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, category_id: parseInt(categoryId) })
-        });
+        await fetch(`${API}/subcategories`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
       }
       closeSubModal();
       loadSubcategories();
@@ -289,40 +260,27 @@
       document.getElementById("add-log-btn").style.display = "none";
     }
 
-    // ログモーダル
     function openLogModal() {
       editingLogId = null;
       document.getElementById("log-modal-title").textContent = "ログ作成";
       document.getElementById("log-title-input").value = "";
       document.getElementById("log-modal").style.display = "block";
     }
-
     function openLogEditModal(id, title) {
       editingLogId = id;
       document.getElementById("log-modal-title").textContent = "タイトル編集";
       document.getElementById("log-title-input").value = title;
       document.getElementById("log-modal").style.display = "block";
     }
-
-    function closeLogModal() {
-      document.getElementById("log-modal").style.display = "none";
-    }
+    function closeLogModal() { document.getElementById("log-modal").style.display = "none"; }
 
     async function saveLog() {
       const title = document.getElementById("log-title-input").value.trim();
       if (!title) return;
       if (editingLogId) {
-        await fetch(`${API}/logs/${editingLogId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId })
-        });
+        await fetch(`${API}/logs/${editingLogId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
       } else {
-        await fetch(`${API}/logs`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId })
-        });
+        await fetch(`${API}/logs`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
       }
       closeLogModal();
       loadLogs(currentSubcategoryId, document.getElementById("subcategory-name").textContent.replace("・", ""));
@@ -337,37 +295,6 @@
     loadCategories();
     if (categoryId) {
       loadSubcategories();
-    } else if (isMobile()) {
-      showCategories();
-    }
-
-    // スマホ用画面切り替え
-    function isMobile() {
-      return window.innerWidth <= 1024;
-    }
-    
-    function showSubcategories() {
-      if (!isMobile()) return;
-      document.querySelector('.sidebar-cat').style.display = 'none';
-      document.querySelector('.sidebar-sub').style.display = 'block';
-      document.querySelector('.main').style.display = 'none';
-      document.getElementById('mobile-back-btn').style.display = 'block';
-    }
-
-    function showLogs() {
-      if (!isMobile()) return;
-      document.querySelector('.sidebar-cat').style.display = 'none';
-      document.querySelector('.sidebar-sub').style.display = 'none';
-      document.querySelector('.main').style.display = 'block';
-      document.getElementById('mobile-back-btn').style.display = 'block';
-    }
-
-    function showCategories() {
-      if (!isMobile()) return;
-      document.querySelector('.sidebar-cat').style.display = 'block';
-      document.querySelector('.sidebar-sub').style.display = 'none';
-      document.querySelector('.main').style.display = 'none';
-      document.getElementById('mobile-back-btn').style.display = 'none';
     }
   </script>
 </body>
