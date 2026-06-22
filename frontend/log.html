@@ -46,19 +46,28 @@
 
     /* スマホレイアウト */
     @media (max-width: 1024px) {
-      .pc-layout { display: none; }
-      .mobile-layout { display: block; overflow-y: auto; }
-
-      .m-title { background: white; border-bottom: 1px solid #ddd; padding: 14px 16px; font-size: 16px; font-weight: bold; text-align: center; }
-      .m-section-header { background: #e4e4e4; padding: 10px 16px; font-size: 14px; font-weight: bold; text-align: center; color: #444; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-      .m-section-body { background: white; padding: 14px 16px; }
-      .m-section-body textarea { width: 100%; padding: 12px; font-size: 15px; border: 1.5px solid #ddd; border-radius: 10px; resize: none; font-family: sans-serif; line-height: 1.8; outline: none; background: #fafafa; }
-      .m-section-body textarea:focus { border-color: #aaa; background: white; }
-      .m-memo-area textarea { min-height: 220px; }
-      .m-memo2-area textarea { min-height: 140px; }
-      .m-footer { background: white; padding: 8px 16px 20px; display: flex; justify-content: flex-end; border-top: 1px solid #eee; }
-      .m-footer .save-btn { padding: 9px 24px; font-size: 14px; }
-    }
+    .pc-layout { display: none; }
+    .mobile-layout { display: block; }
+    /* ヘッダー */
+    header { justify-content: space-between; }
+    .header-meta { text-align: center; flex: 1; }
+    /* タイトル */
+    .m-title { background: white; border-bottom: 1px solid #ddd; padding: 14px 16px; font-size: 16px; font-weight: bold; text-align: center; }
+    /* セクションヘッダー */
+    .m-section-header { background: #e4e4e4; padding: 10px 16px; font-size: 14px; font-weight: bold; text-align: center; color: #444; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+    /* メモエリア */
+    .m-section-body { background: white; padding: 14px 16px; }
+    .m-section-body textarea { width: 100%; padding: 12px; font-size: 15px; border: 1.5px solid #ddd; border-radius: 10px; resize: none; font-family: sans-serif; line-height: 1.8; outline: none; background: white; }
+    .m-section-body textarea:focus { border-color: #aaa; }
+    .m-memo-area textarea { min-height: 260px; }
+    /* 保存ボタン（横線なし） */
+    .m-footer { background: white; padding: 6px 16px 14px; display: flex; justify-content: flex-end; border-top: none; }
+    .m-footer .save-btn { padding: 8px 20px; font-size: 14px; }
+    /* 不明点エリア（白背景・画面下まで拡張） */
+    .m-memo2-area { background: white; padding: 14px 16px 0; }
+    .m-memo2-area textarea { min-height: calc(100vh - 540px); background: white; border-color: #ddd; margin-bottom: 0; }
+  }
+    
   </style>
 </head>
 <body>
