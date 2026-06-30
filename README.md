@@ -4,6 +4,8 @@
 
 PCのフォルダ構造のように階層を作り、時間の流れに沿って記録を積み上げていくことができます。
 
+🔗 **公開URL：** https://studylog-03pu.onrender.com
+
 ---
 
 ## 📌 コンセプト
@@ -29,7 +31,9 @@ PCのフォルダ構造のように階層を作り、時間の流れに沿って
 カテゴリの中分類と、日付・タイトルのログ一覧を表示します。
 
 **画面3 - 詳細ログ**
-ログの詳細（タイトル・メモ・不明点）を表示します。
+ログの詳細（タイトル・メモ・不明点）を表示します。メモと不明点はその場で直接編集・保存できます。
+
+PC・スマートフォン両方のレイアウトに対応しています。スマートフォンではカテゴリ→サブカテゴリ→ログの各階層をタップで切り替えながら閲覧する設計です。
 
 ---
 
@@ -39,7 +43,7 @@ PCのフォルダ構造のように階層を作り、時間の流れに沿って
 |---|---|
 | フロントエンド | HTML / CSS / JavaScript |
 | バックエンド | FastAPI |
-| データベース | PostgreSQL |
+| データベース | PostgreSQL（Supabase） |
 | ORM | SQLAlchemy |
 | バリデーション | Pydantic |
 | ホスティング | Render |
@@ -49,9 +53,11 @@ PCのフォルダ構造のように階層を作り、時間の流れに沿って
 ## 🚀 主な機能
 
 - カテゴリ・サブカテゴリ・詳細ログの3階層管理
-- 各階層の追加・編集・削除（CRUD操作）
-- 詳細ログへのメモ・不明点の記録
+- 各階層の追加・編集・削除（`···`ドロップダウンメニューから操作）
+- カテゴリ・サブカテゴリ削除時のカスケード削除（配下データも連動して削除、削除前に警告表示）
+- 詳細ログへのメモ・不明点の記録（改行対応）
 - カテゴリ一覧のスライドサイドバー
+- PC／スマートフォン対応のレスポンシブデザイン
 
 ---
 
@@ -66,7 +72,8 @@ StudyLog/
 ├── backend/
 │   ├── main.py          # APIエンドポイント定義
 │   ├── database.py      # DB接続設定
-│   └── models.py        # テーブル定義
+│   ├── models.py        # テーブル定義
+│   └── requirements.txt # 依存ライブラリ
 └── .gitignore
 ```
 
@@ -76,13 +83,13 @@ StudyLog/
 
 ### 前提条件
 - Python 3.11以上
-- PostgreSQL
+- PostgreSQL（またはSupabaseなどのホスティングDB）
 
 ### セットアップ
 
 ```bash
 # 依存ライブラリのインストール
-pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic python-dotenv
+pip install -r backend/requirements.txt
 
 # 環境変数の設定
 # backend/.env を作成して以下を記述
@@ -104,11 +111,11 @@ uvicorn main:app --reload
 | カテゴリ | GET | /categories |
 | カテゴリ | POST | /categories |
 | カテゴリ | PUT | /categories/{id} |
-| カテゴリ | DELETE | /categories/{id} |
+| カテゴリ | DELETE | /categories/{id}（カスケード削除） |
 | サブカテゴリ | GET | /subcategories/{category_id} |
 | サブカテゴリ | POST | /subcategories |
 | サブカテゴリ | PUT | /subcategories/{id} |
-| サブカテゴリ | DELETE | /subcategories/{id} |
+| サブカテゴリ | DELETE | /subcategories/{id}（カスケード削除） |
 | ログ | GET | /logs/{subcategory_id} |
 | ログ | GET | /logs/detail/{id} |
 | ログ | POST | /logs |
@@ -117,8 +124,20 @@ uvicorn main:app --reload
 
 ---
 
+## 📜 バージョン履歴
+
+| Ver | 内容 |
+|---|---|
+| Ver1.0 | 初版。フロント3画面・FastAPI + PostgreSQL構築・結合完了 |
+| Ver1.1 | UIからのCRUD操作実装。カスケード削除・警告文追加。GitHub公開・Renderデプロイ |
+| Ver1.2 | UX改善（ログ作成とメモ編集の分離、`···`ドロップダウンメニュー導入）。デザイン刷新。PC／スマホ対応のレスポンシブレイアウト実装。データベースをSupabaseへ移行 |
+
+---
+
 ## 🔮 今後の予定（Ver2.0以降）
 
+- Google OAuth認証機能の追加（ユーザーごとのデータ分離）
+- ユーザーごとのタイムゾーン対応
 - 可変階層の実装（ユーザーが自由に深さを決められる）
-- 認証機能の追加
+- メモ欄への画像貼り付け対応
 - AI理解度テスト機能（学習内容から自動で問題を生成）
