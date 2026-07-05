@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyLog</title>
+  <script src="auth.js"></script>
   <style>
     body { margin: 0; font-family: sans-serif; }
     header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; position: relative; }
@@ -84,6 +85,7 @@
   <header>
     <button class="back-btn" onclick="location.href='index.html'">← 戻る</button>
     StudyLog
+    <button onclick="logout()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); padding:6px 12px; background:#eee; border:1px solid #aaa; border-radius:6px; cursor:pointer; font-size:13px;">ログアウト</button>
   </header>
 
   <div class="layout">
@@ -126,9 +128,8 @@
   </div>
 
   <script>
-    const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
-      ? "http://127.0.0.1:8000"
-      : window.location.origin;
+    requireAuth();
+
     const params = new URLSearchParams(location.search);
     const categoryId = params.get("category_id");
     const categoryName = decodeURIComponent(params.get("category_name") || "");
@@ -136,6 +137,8 @@
     let editingLogId = null;
     let currentSubcategoryId = null;
     let openDropdown = null;
+    let editingLogMemo = "";
+    let editingLogMemo2 = "";
 
     document.getElementById("category-name").textContent = categoryName;
 
@@ -143,7 +146,6 @@
       document.body.className = panel === "cat" ? "" : `show-${panel}`;
     }
 
-    // カテゴリIDがあればサブパネルを表示
     if (categoryId) showPanel("sub");
 
     document.addEventListener("click", () => {
@@ -159,7 +161,7 @@
     }
 
     async function loadCategories() {
-      const res = await fetch(`${API}/categories`);
+      const res = await authFetch(`${API}/categories`);
       const categories = await res.json();
       const ul = document.getElementById("category-list");
       ul.innerHTML = "";
@@ -175,7 +177,7 @@
     }
 
     async function loadSubcategories() {
-      const res = await fetch(`${API}/subcategories/${categoryId}`);
+      const res = await authFetch(`${API}/subcategories/${categoryId}`);
       const subcategories = await res.json();
       const ul = document.getElementById("subcategory-list");
       ul.innerHTML = "";
@@ -198,7 +200,7 @@
       currentSubcategoryId = subcategoryId;
       document.getElementById("subcategory-name").textContent = `・${subcategoryName}`;
       document.getElementById("add-log-btn").style.display = "block";
-      const res = await fetch(`${API}/logs/${subcategoryId}`);
+      const res = await authFetch(`${API}/logs/${subcategoryId}`);
       const logs = await res.json();
       const div = document.getElementById("log-list");
       div.innerHTML = "";
@@ -236,9 +238,9 @@
       const name = document.getElementById("sub-modal-input").value.trim();
       if (!name) return;
       if (editingSubId) {
-        await fetch(`${API}/subcategories/${editingSubId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
+        await authFetch(`${API}/subcategories/${editingSubId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
       } else {
-        await fetch(`${API}/subcategories`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
+        await authFetch(`${API}/subcategories`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
       }
       closeSubModal();
       loadSubcategories();
@@ -246,7 +248,7 @@
 
     async function deleteSubcategory(id) {
       if (!confirm("削除しますか？\n配下のログも全て削除されます。")) return;
-      await fetch(`${API}/subcategories/${id}`, { method: "DELETE" });
+      await authFetch(`${API}/subcategories/${id}`, { method: "DELETE" });
       loadSubcategories();
       document.getElementById("log-list").innerHTML = "";
       document.getElementById("subcategory-name").textContent = "";
@@ -259,21 +261,29 @@
       document.getElementById("log-title-input").value = "";
       document.getElementById("log-modal").style.display = "block";
     }
-    function openLogEditModal(id, title) {
+    async function openLogEditModal(id, title) {
       editingLogId = id;
       document.getElementById("log-modal-title").textContent = "タイトル編集";
       document.getElementById("log-title-input").value = title;
+
+      // タイトルだけ編集する場合でも、既存のメモ・不明点を消さないよう先に取得しておく
+      const res = await authFetch(`${API}/logs/detail/${id}`);
+      const log = await res.json();
+      editingLogMemo = log.memo || "";
+      editingLogMemo2 = log.memo2 || "";
+
       document.getElementById("log-modal").style.display = "block";
     }
+
     function closeLogModal() { document.getElementById("log-modal").style.display = "none"; }
 
     async function saveLog() {
       const title = document.getElementById("log-title-input").value.trim();
       if (!title) return;
       if (editingLogId) {
-        await fetch(`${API}/logs/${editingLogId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
+        await authFetch(`${API}/logs/${editingLogId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: editingLogMemo, memo2: editingLogMemo2, subcategory_id: currentSubcategoryId }) });
       } else {
-        await fetch(`${API}/logs`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
+        await authFetch(`${API}/logs`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
       }
       closeLogModal();
       loadLogs(currentSubcategoryId, document.getElementById("subcategory-name").textContent.replace("・", ""));
@@ -281,7 +291,7 @@
 
     async function deleteLog(id, subcategoryId, subcategoryName) {
       if (!confirm("削除しますか？")) return;
-      await fetch(`${API}/logs/${id}`, { method: "DELETE" });
+      await authFetch(`${API}/logs/${id}`, { method: "DELETE" });
       loadLogs(subcategoryId, subcategoryName);
     }
 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyLog - ログイン</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f5f5f5; display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .login-box { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 40px 32px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .login-box h1 { margin: 0 0 8px; font-size: 22px; }
+    .login-box p { margin: 0 0 24px; color: #666; font-size: 14px; }
+    .error-msg { color: #e53e3e; font-size: 13px; margin-top: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>StudyLog</h1>
+    <p>あなたの軌跡を記録しましょう</p>
+
+    <div id="g_id_onload"
+      data-client_id=489233683953-r3n2f40m2h8rgqctlu6rsgprdv7f0h8d.apps.googleusercontent.com
+      data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular"></div>
+
+    <div class="error-msg" id="error-msg">ログインに失敗しました。もう一度お試しください。</div>
+  </div>
+
+  <script>
+    const API = (location.hostname === "127.0.0.1" || location.hostname === "localhost")
+      ? "http://127.0.0.1:8000"
+      : window.location.origin;
+
+    async function handleCredentialResponse(response) {
+      try {
+        const res = await fetch(`${API}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_token: response.credential })
+        });
+        if (!res.ok) throw new Error("Login failed");
+        const data = await res.json();
+        localStorage.setItem("studylog_token", data.access_token);
+        location.href = "index.html";
+      } catch (err) {
+        document.getElementById("error-msg").style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>

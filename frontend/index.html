@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyLog</title>
+  <script src="auth.js"></script>
   <style>
     body { margin: 0; font-family: sans-serif; }
     header { background: #ccc; text-align: center; padding: 16px; font-size: 24px; font-weight: bold; }
@@ -52,7 +53,7 @@
   </style>
 </head>
 <body>
-  <header>StudyLog</header>
+  <header>StudyLog <button onclick="logout()" style="float:right; margin-top:-2px; padding:6px 12px; background:#eee; border:1px solid #aaa; border-radius:6px; cursor:pointer; font-size:13px;">ログアウト</button></header>
   <div class="layout">
     <div class="sidebar">
       <h2>Log</h2>
@@ -75,14 +76,12 @@
   </div>
 
   <script>
-    const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
-      ? "http://127.0.0.1:8000"
-      : window.location.origin;
+    requireAuth();
     let editingId = null;
     let openDropdown = null;
 
     async function loadCategories() {
-      const res = await fetch(`${API}/categories`);
+      const res = await authFetch(`${API}/categories`);
       const categories = await res.json();
       const ul = document.getElementById("category-list");
       ul.innerHTML = "";
@@ -141,13 +140,13 @@
       const name = document.getElementById("modal-input").value.trim();
       if (!name) return;
       if (editingId) {
-        await fetch(`${API}/categories/${editingId}`, {
+        await authFetch(`${API}/categories/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name })
         });
       } else {
-        await fetch(`${API}/categories`, {
+        await authFetch(`${API}/categories`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name })
@@ -159,7 +158,7 @@
 
     async function deleteCategory(id) {
       if (!confirm("削除しますか？\n配下のサブカテゴリとログも全て削除されます。")) return;
-      await fetch(`${API}/categories/${id}`, { method: "DELETE" });
+      await authFetch(`${API}/categories/${id}`, { method: "DELETE" });
       loadCategories();
     }
 

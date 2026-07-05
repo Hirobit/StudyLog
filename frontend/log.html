@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyLog - ログ詳細</title>
+  <script src="auth.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: sans-serif; background: #f5f5f5; }
@@ -74,6 +75,7 @@
   <!-- スライドサイドバー -->
   <div class="slide-sidebar" id="slide-sidebar">
     <button class="home-btn" onclick="location.href='index.html'">⌂ ホーム</button>
+     <button class="home-btn" onclick="logout()" style="background:#f5f5f5;">ログアウト</button>
     <h3>カテゴリ一覧</h3>
     <ul id="slide-category-list"></ul>
   </div>
@@ -122,15 +124,14 @@
   </div>
 
   <script>
-    const API = window.location.origin === "http://127.0.0.1:5500" || window.location.origin === "file://"
-      ? "http://127.0.0.1:8000"
-      : window.location.origin;
+    requireAuth();
+
     const params = new URLSearchParams(location.search);
     const logId = params.get("log_id");
     let currentLog = null;
 
     async function loadLog() {
-      const res = await fetch(`${API}/logs/detail/${logId}`);
+      const res = await authFetch(`${API}/logs/detail/${logId}`);
       currentLog = await res.json();
       const date = currentLog.created_at ? currentLog.created_at.slice(0, 10) : "";
       const title = `学習内容　${currentLog.title}`;
@@ -155,7 +156,7 @@
         ? document.getElementById("memo2-input-mobile").value
         : document.getElementById("memo2-input-pc").value;
 
-      await fetch(`${API}/logs/${logId}`, {
+      await authFetch(`${API}/logs/${logId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: currentLog.title, memo, memo2, subcategory_id: currentLog.subcategory_id })
@@ -164,9 +165,10 @@
     }
 
     async function loadSlideCategories() {
-      const res = await fetch(`${API}/categories`);
+      const res = await authFetch(`${API}/categories`);
       const categories = await res.json();
       const ul = document.getElementById("slide-category-list");
+      ul.innerHTML = "";
       categories.forEach(cat => {
         const li = document.createElement("li");
         li.textContent = `・${cat.name}`;
