@@ -13,7 +13,7 @@ JWT_EXPIRE_MINUTES = 60 * 24 * 7  # 7日間有効
 def verify_google_id_token(token: str) -> dict:
     """
     フロントから送られてきたGoogleのIDトークンを検証し、
-    ユーザー情報（google_id, email, name）を返す。
+    ユーザー情報（google_id, name）を返す。
     不正・改ざん・期限切れのトークンの場合は例外を投げる。
     """
     idinfo = id_token.verify_oauth2_token(
@@ -25,7 +25,6 @@ def verify_google_id_token(token: str) -> dict:
 
     return {
         "google_id": idinfo["sub"],
-        "email": idinfo["email"],
         "name": idinfo.get("name"),
     }
 

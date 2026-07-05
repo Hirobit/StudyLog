@@ -47,12 +47,10 @@ class GoogleLoginRequest(BaseModel):
 
 class UserResponse(BaseModel):
     id: str
-    email: str
     name: str | None
 
     class Config:
         from_attributes = True
-
 
 def get_current_user(authorization: str = Header(None), db: Session = Depends(get_db)) -> models.User:
     """
@@ -87,7 +85,6 @@ def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)):
     if not user:
         user = models.User(
             google_id=user_info["google_id"],
-            email=user_info["email"],
             name=user_info["name"],
         )
         db.add(user)

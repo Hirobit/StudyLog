@@ -10,7 +10,6 @@ class User(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     google_id = Column(String, unique=True, nullable=False, index=True)
-    email = Column(String, unique=True, nullable=False, index=True)
     name = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
 
