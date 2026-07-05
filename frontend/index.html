@@ -139,21 +139,27 @@
     async function saveCategory() {
       const name = document.getElementById("modal-input").value.trim();
       if (!name) return;
-      if (editingId) {
-        await authFetch(`${API}/categories/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name })
-        });
-      } else {
-        await authFetch(`${API}/categories`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name })
-        });
+      const saveBtn = document.querySelector("#modal-overlay .btn-save");
+      saveBtn.disabled = true;
+      try {
+        if (editingId) {
+          await authFetch(`${API}/categories/${editingId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+          });
+        } else {
+          await authFetch(`${API}/categories`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+          });
+        }
+        closeModal();
+        loadCategories();
+      } finally {
+        saveBtn.disabled = false;
       }
-      closeModal();
-      loadCategories();
     }
 
     async function deleteCategory(id) {

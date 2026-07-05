@@ -237,13 +237,19 @@
     async function saveSubcategory() {
       const name = document.getElementById("sub-modal-input").value.trim();
       if (!name) return;
-      if (editingSubId) {
-        await authFetch(`${API}/subcategories/${editingSubId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
-      } else {
-        await authFetch(`${API}/subcategories`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
+      const saveBtn = document.querySelector("#sub-modal .btn-save");
+      saveBtn.disabled = true;
+      try {
+        if (editingSubId) {
+          await authFetch(`${API}/subcategories/${editingSubId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
+        } else {
+          await authFetch(`${API}/subcategories`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, category_id: parseInt(categoryId) }) });
+        }
+        closeSubModal();
+        loadSubcategories();
+      } finally {
+        saveBtn.disabled = false;
       }
-      closeSubModal();
-      loadSubcategories();
     }
 
     async function deleteSubcategory(id) {
@@ -280,13 +286,19 @@
     async function saveLog() {
       const title = document.getElementById("log-title-input").value.trim();
       if (!title) return;
-      if (editingLogId) {
-        await authFetch(`${API}/logs/${editingLogId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: editingLogMemo, memo2: editingLogMemo2, subcategory_id: currentSubcategoryId }) });
-      } else {
-        await authFetch(`${API}/logs`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
+      const saveBtn = document.querySelector("#log-modal .btn-save");
+      saveBtn.disabled = true;
+      try {
+        if (editingLogId) {
+          await authFetch(`${API}/logs/${editingLogId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: editingLogMemo, memo2: editingLogMemo2, subcategory_id: currentSubcategoryId }) });
+        } else {
+          await authFetch(`${API}/logs`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, memo: "", memo2: "", subcategory_id: currentSubcategoryId }) });
+        }
+        closeLogModal();
+        loadLogs(currentSubcategoryId, document.getElementById("subcategory-name").textContent.replace("・", ""));
+      } finally {
+        saveBtn.disabled = false;
       }
-      closeLogModal();
-      loadLogs(currentSubcategoryId, document.getElementById("subcategory-name").textContent.replace("・", ""));
     }
 
     async function deleteLog(id, subcategoryId, subcategoryName) {
