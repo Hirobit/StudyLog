@@ -4,3 +4,5 @@ sqlalchemy
 psycopg2-binary
 pydantic
 python-dotenv
+PyJWT>=2.13.0
+google-auth
