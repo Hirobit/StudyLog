@@ -42,6 +42,8 @@
     .memo-card-footer { padding: 8px 12px 12px; display: flex; justify-content: flex-end; }
     .save-btn { padding: 8px 20px; background: #555; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
     .save-btn:hover { background: #333; }
+    .public-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #444; margin-bottom: 12px; cursor: pointer; }
+    .public-toggle input { width: 16px; height: 16px; cursor: pointer; }
 
     /* スマホ：非表示 */
     .mobile-layout { display: none; }
@@ -91,6 +93,10 @@
   <!-- PCレイアウト -->
   <div class="pc-layout">
     <div class="pc-sidebar">
+      <label class="public-toggle">
+        <input type="checkbox" id="is-public-toggle-pc" onchange="togglePublic()">
+        このログを公開する
+      </label>
       <h3>不明点</h3>
       <textarea id="memo2-input-pc" placeholder="不明点を入力..."></textarea>
     </div>
@@ -111,6 +117,12 @@
   <!-- スマホレイアウト -->
   <div class="mobile-layout">
     <div class="m-title" id="title-box-mobile"></div>
+    <div class="m-section-body" style="padding-top: 10px; padding-bottom: 10px;">
+      <label class="public-toggle">
+        <input type="checkbox" id="is-public-toggle-mobile" onchange="togglePublic()">
+        このログを公開する
+      </label>
+    </div>
     <div class="m-section-header">メモ</div>
     <div class="m-section-body m-memo-area">
       <textarea id="memo-input-mobile" placeholder="メモを入力..."></textarea>
@@ -146,6 +158,8 @@
       document.getElementById("memo-input-mobile").value = memo;
       document.getElementById("memo2-input-pc").value = memo2;
       document.getElementById("memo2-input-mobile").value = memo2;
+      document.getElementById("is-public-toggle-pc").checked = currentLog.is_public;
+      document.getElementById("is-public-toggle-mobile").checked = currentLog.is_public;
     }
 
     async function saveMemo() {
@@ -163,6 +177,30 @@
         body: JSON.stringify({ title: currentLog.title, memo, memo2, subcategory_id: currentLog.subcategory_id })
       });
       alert("保存しました");
+    }
+
+    async function togglePublic() {
+      const isMobile = window.innerWidth <= 1024;
+      const isPublic = isMobile
+        ? document.getElementById("is-public-toggle-mobile").checked
+        : document.getElementById("is-public-toggle-pc").checked;
+
+      // PC・スマホ両方のチェックボックスの状態を同期
+      document.getElementById("is-public-toggle-pc").checked = isPublic;
+      document.getElementById("is-public-toggle-mobile").checked = isPublic;
+
+      await authFetch(`${API}/logs/${logId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: currentLog.title,
+          memo: currentLog.memo,
+          memo2: currentLog.memo2,
+          subcategory_id: currentLog.subcategory_id,
+          is_public: isPublic
+        })
+      });
+      currentLog.is_public = isPublic;
     }
 
     async function loadSlideCategories() {

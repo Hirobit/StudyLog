@@ -199,6 +199,7 @@ class LogCreate(BaseModel):
     memo: str = None
     memo2: str = None
     subcategory_id: int
+    is_public: bool | None = None
 
 class LogResponse(BaseModel):
     id: int
@@ -206,6 +207,7 @@ class LogResponse(BaseModel):
     memo: str = None
     memo2: str = None
     subcategory_id: int
+    is_public: bool
 
     class Config:
         from_attributes = True
@@ -244,7 +246,8 @@ def create_log(log: LogCreate, current_user: models.User = Depends(get_current_u
         memo=log.memo,
         memo2=log.memo2,
         subcategory_id=log.subcategory_id,
-        user_id=current_user.id
+        user_id=current_user.id,
+        is_public=log.is_public if log.is_public is not None else False
     )
     db.add(db_log)
     db.commit()
@@ -264,6 +267,8 @@ def update_log(id: int, log: LogCreate, current_user: models.User = Depends(get_
     db_log.memo = log.memo
     db_log.memo2 = log.memo2
     db_log.subcategory_id = log.subcategory_id
+    if log.is_public is not None:
+        db_log.is_public = log.is_public
     db.commit()
     db.refresh(db_log)
     return db_log
@@ -280,6 +285,49 @@ def delete_log(id: int, current_user: models.User = Depends(get_current_user), d
     db.delete(db_log)
     db.commit()
     return {"message": "Deleted"}
+
+# 公開ログ一覧取得（認証不要・is_publicのログのみ）
+@app.get("/public/logs")
+def get_public_logs(db: Session = Depends(get_db)):
+    results = db.query(models.Log, models.Subcategory.name, models.Category.name).join(
+        models.Subcategory, models.Log.subcategory_id == models.Subcategory.id
+    ).join(
+        models.Category, models.Subcategory.category_id == models.Category.id
+    ).filter(models.Log.is_public == True).order_by(models.Log.created_at.desc()).all()
+
+    return [
+        {
+            "id": log.id,
+            "title": log.title,
+            "created_at": log.created_at,
+            "category_name": category_name,
+            "subcategory_name": subcategory_name,
+        }
+        for log, subcategory_name, category_name in results
+    ]
+
+# 公開ログ詳細取得（認証不要・is_publicのログのみ）
+@app.get("/public/logs/{id}")
+def get_public_log(id: int, db: Session = Depends(get_db)):
+    result = db.query(models.Log, models.Subcategory.name, models.Category.name).join(
+        models.Subcategory, models.Log.subcategory_id == models.Subcategory.id
+    ).join(
+        models.Category, models.Subcategory.category_id == models.Category.id
+    ).filter(models.Log.id == id, models.Log.is_public == True).first()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Log not found")
+
+    log, subcategory_name, category_name = result
+    return {
+        "id": log.id,
+        "title": log.title,
+        "memo": log.memo,
+        "memo2": log.memo2,
+        "created_at": log.created_at,
+        "category_name": category_name,
+        "subcategory_name": subcategory_name,
+    }
 
 # フロントエンドの静的ファイルを配信する設定
 # directory="../frontend" → backendフォルダから見て一つ上のfrontendフォルダを指定
