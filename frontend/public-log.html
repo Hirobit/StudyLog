@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyLog - 公開ログ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; }
+    header { background: #ccc; padding: 10px 16px; }
+    .back-btn { padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none; color: inherit; }
+    .container { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
+    .title-box { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px 16px; font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+    .meta { font-size: 12px; color: #888; margin-bottom: 20px; }
+    .memo-card { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+    .memo-card-header { background: #e8e8e8; padding: 10px 16px; font-size: 14px; font-weight: bold; color: #444; border-bottom: 1px solid #ddd; }
+    .memo-card-body { padding: 14px 16px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; min-height: 40px; }
+    .empty { text-align: center; color: #888; margin-top: 40px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back-btn" href="public.html">← 一覧へ</a>
+  </header>
+  <div class="container" id="log-container">
+    <div class="empty">読み込み中...</div>
+  </div>
+
+  <script>
+    const API = (location.hostname === "127.0.0.1" || location.hostname === "localhost")
+      ? "http://127.0.0.1:8000"
+      : window.location.origin;
+
+    const params = new URLSearchParams(location.search);
+    const logId = params.get("log_id");
+
+    async function loadPublicLog() {
+      const container = document.getElementById("log-container");
+      const res = await fetch(`${API}/public/logs/${logId}`);
+
+      if (!res.ok) {
+        container.innerHTML = "";
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "このログは公開されていないか、削除されました";
+        container.appendChild(empty);
+        return;
+      }
+
+      const log = await res.json();
+      const date = log.created_at ? log.created_at.slice(0, 10) : "";
+
+      container.innerHTML = `
+        <div class="title-box" id="log-title"></div>
+        <div class="meta" id="log-meta"></div>
+        <div class="memo-card">
+          <div class="memo-card-header">メモ</div>
+          <div class="memo-card-body" id="log-memo"></div>
+        </div>
+        <div class="memo-card">
+          <div class="memo-card-header">不明点</div>
+          <div class="memo-card-body" id="log-memo2"></div>
+        </div>
+      `;
+
+      document.getElementById("log-title").textContent = log.title;
+      document.getElementById("log-meta").textContent = `${log.category_name} / ${log.subcategory_name}　${date}`;
+      document.getElementById("log-memo").textContent = log.memo || "（内容なし）";
+      document.getElementById("log-memo2").textContent = log.memo2 || "（内容なし）";
+    }
+
+    loadPublicLog();
+  </script>
+</body>
+</html>

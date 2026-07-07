@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyLog - 公開ログ一覧</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; }
+    header { background: #ccc; text-align: center; padding: 16px; font-size: 20px; font-weight: bold; }
+    .container { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
+    .log-card { display: block; background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .log-card:hover { background: #fafafa; }
+    .log-title { font-size: 15px; font-weight: bold; margin-bottom: 6px; }
+    .log-meta { font-size: 12px; color: #888; }
+    .empty { text-align: center; color: #888; margin-top: 40px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>StudyLog 公開ログ</header>
+  <div class="container" id="log-list">
+    <div class="empty">読み込み中...</div>
+  </div>
+
+  <script>
+    const API = (location.hostname === "127.0.0.1" || location.hostname === "localhost")
+      ? "http://127.0.0.1:8000"
+      : window.location.origin;
+
+    async function loadPublicLogs() {
+      const res = await fetch(`${API}/public/logs`);
+      const logs = await res.json();
+      const div = document.getElementById("log-list");
+
+      if (logs.length === 0) {
+        div.innerHTML = "";
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "公開されているログはまだありません";
+        div.appendChild(empty);
+        return;
+      }
+
+      div.innerHTML = "";
+      logs.forEach(log => {
+        const a = document.createElement("a");
+        a.className = "log-card";
+        a.href = `public-log.html?log_id=${log.id}`;
+
+        const titleDiv = document.createElement("div");
+        titleDiv.className = "log-title";
+        titleDiv.textContent = log.title;
+
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "log-meta";
+        const date = log.created_at ? log.created_at.slice(0, 10) : "";
+        metaDiv.textContent = `${log.category_name} / ${log.subcategory_name}　${date}`;
+
+        a.appendChild(titleDiv);
+        a.appendChild(metaDiv);
+        div.appendChild(a);
+      });
+    }
+
+    loadPublicLogs();
+  </script>
+</body>
+</html>
