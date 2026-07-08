@@ -178,23 +178,52 @@
 
     async function loadSubcategories() {
       const res = await authFetch(`${API}/subcategories/${categoryId}`);
-      const subcategories = await res.json();
-      const ul = document.getElementById("subcategory-list");
-      ul.innerHTML = "";
-      subcategories.forEach(sub => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <div class="sub-row">
-            <span class="sub-name" onclick="loadLogs(${sub.id}, '${sub.name}'); showPanel('main');">・${sub.name}</span>
-            <button class="sub-menu-btn" onclick="toggleDropdown(event, 'sub-dropdown-${sub.id}')">···</button>
-          </div>
-          <div class="sub-dropdown" id="sub-dropdown-${sub.id}">
-            <button onclick="openSubEditModal(${sub.id}, '${sub.name}')">編集</button>
-            <button class="del" onclick="deleteSubcategory(${sub.id})">削除</button>
-          </div>`;
-        ul.appendChild(li);
-      });
-    }
+       const subcategories = await res.json();
+       const ul = document.getElementById("subcategory-list");
+       ul.innerHTML = "";
+       subcategories.forEach(sub => {
+         const li = document.createElement("li");
+
+         const row = document.createElement("div");
+         row.className = "sub-row";
+
+         const nameSpan = document.createElement("span");
+         nameSpan.className = "sub-name";
+         nameSpan.textContent = `・${sub.name}`;
+        nameSpan.onclick = () => {
+           loadLogs(sub.id, sub.name);
+           showPanel('main');
+         };
+
+         const menuBtn = document.createElement("button");
+         menuBtn.className = "sub-menu-btn";
+         menuBtn.textContent = "···";
+         menuBtn.onclick = (e) => toggleDropdown(e, `sub-dropdown-${sub.id}`);
+
+         row.appendChild(nameSpan);
+         row.appendChild(menuBtn);
+
+         const dropdown = document.createElement("div");
+        dropdown.className = "sub-dropdown";
+         dropdown.id = `sub-dropdown-${sub.id}`;
+
+         const editBtn = document.createElement("button");
+         editBtn.textContent = "編集";
+         editBtn.onclick = () => openSubEditModal(sub.id, sub.name);
+
+         const delBtn = document.createElement("button");
+         delBtn.className = "del";
+         delBtn.textContent = "削除";
+         delBtn.onclick = () => deleteSubcategory(sub.id);
+
+         dropdown.appendChild(editBtn);
+         dropdown.appendChild(delBtn);
+
+         li.appendChild(row);
+         li.appendChild(dropdown);
+         ul.appendChild(li);
+       });
+     }
 
     async function loadLogs(subcategoryId, subcategoryName) {
       currentSubcategoryId = subcategoryId;
@@ -207,15 +236,44 @@
       logs.forEach(log => {
         const wrap = document.createElement("div");
         wrap.className = "log-item-wrap";
-        wrap.innerHTML = `
-          <div class="log-item">
-            <span class="log-name" onclick="location.href='log.html?log_id=${log.id}'">・${log.created_at ? log.created_at.slice(0,10) : ""} / ${log.title}</span>
-            <button class="log-menu-btn" onclick="toggleDropdown(event, 'log-dropdown-${log.id}')">···</button>
-          </div>
-          <div class="log-dropdown" id="log-dropdown-${log.id}">
-            <button onclick="openLogEditModal(${log.id}, '${log.title}')">編集</button>
-            <button class="del" onclick="deleteLog(${log.id}, ${subcategoryId}, '${subcategoryName}')">削除</button>
-          </div>`;
+
+        const item = document.createElement("div");
+        item.className = "log-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "log-name";
+        const date = log.created_at ? log.created_at.slice(0, 10) : "";
+        nameSpan.textContent = `・${date} / ${log.title}`;
+        nameSpan.onclick = () => {
+          location.href = `log.html?log_id=${log.id}`;
+        };
+
+        const menuBtn = document.createElement("button");
+        menuBtn.className = "log-menu-btn";
+        menuBtn.textContent = "···";
+        menuBtn.onclick = (e) => toggleDropdown(e, `log-dropdown-${log.id}`);
+
+        item.appendChild(nameSpan);
+        item.appendChild(menuBtn);
+
+        const dropdown = document.createElement("div");
+        dropdown.className = "log-dropdown";
+        dropdown.id = `log-dropdown-${log.id}`;
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "編集";
+        editBtn.onclick = () => openLogEditModal(log.id, log.title);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "del";
+        delBtn.textContent = "削除";
+        delBtn.onclick = () => deleteLog(log.id, subcategoryId, subcategoryName);
+
+        dropdown.appendChild(editBtn);
+        dropdown.appendChild(delBtn);
+
+        wrap.appendChild(item);
+        wrap.appendChild(dropdown);
         div.appendChild(wrap);
       });
     }

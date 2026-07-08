@@ -90,16 +90,43 @@
       ul.innerHTML = "";
       categories.forEach(cat => {
         const li = document.createElement("li");
-        li.innerHTML = `
-          <div class="cat-row">
-            <span class="cat-name" onclick="location.href='category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}'">・${cat.name}</span>
-            <button class="cat-menu-btn" onclick="toggleDropdown(event, 'dropdown-${cat.id}')">···</button>
-          </div>
-          <div class="cat-dropdown" id="dropdown-${cat.id}">
-            <button onclick="openEditModal(${cat.id}, '${cat.name}')"> 編集</button>
-            <button class="del" onclick="deleteCategory(${cat.id})"> 削除</button>
-          </div>
-        `;
+
+        const row = document.createElement("div");
+        row.className = "cat-row";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "cat-name";
+        nameSpan.textContent = `・${cat.name}`;
+        nameSpan.onclick = () => {
+          location.href = `category.html?category_id=${cat.id}&category_name=${encodeURIComponent(cat.name)}`;
+        };
+
+        const menuBtn = document.createElement("button");
+        menuBtn.className = "cat-menu-btn";
+        menuBtn.textContent = "···";
+        menuBtn.onclick = (e) => toggleDropdown(e, `dropdown-${cat.id}`);
+
+        row.appendChild(nameSpan);
+        row.appendChild(menuBtn);
+
+        const dropdown = document.createElement("div");
+        dropdown.className = "cat-dropdown";
+        dropdown.id = `dropdown-${cat.id}`;
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = " 編集";
+        editBtn.onclick = () => openEditModal(cat.id, cat.name);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "del";
+        delBtn.textContent = " 削除";
+        delBtn.onclick = () => deleteCategory(cat.id);
+
+        dropdown.appendChild(editBtn);
+        dropdown.appendChild(delBtn);
+
+        li.appendChild(row);
+        li.appendChild(dropdown);
         ul.appendChild(li);
       });
     }
