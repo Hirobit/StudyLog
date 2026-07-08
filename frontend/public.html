@@ -7,7 +7,8 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: sans-serif; background: #f5f5f5; }
-    header { background: #ccc; text-align: center; padding: 16px; font-size: 20px; font-weight: bold; }
+    header { background: #ccc; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+    .top-btn { padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none; color: inherit; white-space: nowrap; }
     .container { max-width: 640px; margin: 0 auto; padding: 24px 16px; }
     .log-card { display: block; background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .log-card:hover { background: #fafafa; }
@@ -17,7 +18,10 @@
   </style>
 </head>
 <body>
-  <header>StudyLog 公開ログ</header>
+  <header>
+    <a class="top-btn" href="index.html">← あなたのログへ</a>
+    <span style="font-size: 18px; font-weight: bold;">公開ログ</span>
+  </header>
   <div class="container" id="log-list">
     <div class="empty">読み込み中...</div>
   </div>
