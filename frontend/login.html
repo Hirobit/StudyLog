@@ -10,6 +10,7 @@
     .login-box { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 40px 32px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .login-box h1 { margin: 0 0 8px; font-size: 22px; }
     .login-box p { margin: 0 0 24px; color: #666; font-size: 14px; }
+    .guest-link { display: block; margin-top: 20px; font-size: 13px; color: #666; text-decoration: underline; cursor: pointer; }
     .error-msg { color: #e53e3e; font-size: 13px; margin-top: 16px; display: none; }
   </style>
 </head>
@@ -23,6 +24,8 @@
       data-callback="handleCredentialResponse">
     </div>
     <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular"></div>
+
+    <a href="public.html" class="guest-link">ゲストモードで公開ログを見る</a>
 
     <div class="error-msg" id="error-msg">ログインに失敗しました。もう一度お試しください。</div>
   </div>
