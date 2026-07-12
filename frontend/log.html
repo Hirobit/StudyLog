@@ -7,10 +7,27 @@
   <script src="auth.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: sans-serif; background: #f5f5f5; }
+    :root {
+      --page-bg: #f5f5f5;
+      --header-bg: #ccc;
+      --sidebar-bg: #ddd;
+      --section-header-bg: #e8e8e8;
+      --m-title-bg: white;
+      --m-section-header-bg: #e4e4e4;
+    }
+    
+    body.public-mode {
+      --page-bg: #eef5f6;
+      --header-bg: #cfe3ea;
+      --sidebar-bg: #dcedf2;
+      --section-header-bg: #e4f2f6;
+      --m-title-bg: #eef7fa;
+      --m-section-header-bg: #dcedf2;
+    }
+    body { font-family: sans-serif; background: var(--page-bg); transition: background-color 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.9s; }
 
     /* ヘッダー */
-    header { background: #ccc; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+    header { background: var(--header-bg); padding: 10px 16px; display: flex; align-items: center; gap: 12px; transition: background-color 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0s; }
     .menu-btn { padding: 6px 12px; background: #eee; border: 1px solid #aaa; border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap; }
     .header-meta { font-size: 13px; color: #444; flex: 1; }
     .header-brand { font-size: 13px; color: #888; }
@@ -29,13 +46,13 @@
 
     /* PC：デスクトップレイアウト */
     .pc-layout { display: flex; height: calc(100vh - 50px); }
-    .pc-sidebar { width: 220px; background: #ddd; padding: 20px; border-right: 1px solid #ccc; display: flex; flex-direction: column; gap: 8px; }
+    .pc-sidebar { width: 220px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid #ccc; display: flex; flex-direction: column; gap: 8px; transition: background-color 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.25s; }
     .pc-sidebar h3 { font-size: 15px; text-align: center; color: #444; }
     .pc-sidebar textarea { flex: 1; width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; resize: none; background: #fafafa; font-family: sans-serif; line-height: 1.7; }
     .pc-main { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .title-box { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px 16px; font-size: 18px; font-weight: bold; text-align: center; }
     .memo-card { flex: 1; background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
-    .memo-card-header { background: #e8e8e8; padding: 10px 16px; font-size: 15px; font-weight: bold; text-align: center; color: #444; border-bottom: 1px solid #ddd; }
+    .memo-card-header { background: var(--section-header-bg); padding: 10px 16px; font-size: 15px; font-weight: bold; text-align: center; color: #444; border-bottom: 1px solid #ddd; transition: background-color 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.5s; }
     .memo-card-body { flex: 1; padding: 12px; }
     .memo-card-body textarea { width: 100%; height: 100%; min-height: 300px; padding: 10px; font-size: 15px; border: 1px solid #ddd; border-radius: 8px; resize: none; font-family: sans-serif; line-height: 1.7; background: #fafafa; outline: none; }
     .memo-card-body textarea:focus { border-color: #aaa; background: white; }
@@ -56,9 +73,9 @@
     header { justify-content: space-between; }
     .header-meta { text-align: center; flex: 1; }
     /* タイトル */
-    .m-title { background: white; border-bottom: 1px solid #ddd; padding: 14px 16px; font-size: 16px; font-weight: bold; text-align: center; }
+    .m-title { background: var(--m-title-bg); border-bottom: 1px solid #ddd; padding: 14px 16px; font-size: 16px; font-weight: bold; text-align: center; transition: background-color 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.25s; }
     /* セクションヘッダー */
-    .m-section-header { background: #e4e4e4; padding: 10px 16px; font-size: 14px; font-weight: bold; text-align: center; color: #444; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+    .m-section-header { background: var(--m-section-header-bg); padding: 10px 16px; font-size: 14px; font-weight: bold; text-align: center; color: #444; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; transition: background-color 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.5s; }
     /* メモエリア */
     .m-section-body { background: white; padding: 14px 16px; }
     .m-section-body textarea { width: 100%; padding: 12px; font-size: 15px; border: 1.5px solid #ddd; border-radius: 10px; resize: none; font-family: sans-serif; line-height: 1.8; outline: none; background: white; }
@@ -160,6 +177,7 @@
       document.getElementById("memo2-input-mobile").value = memo2;
       document.getElementById("is-public-toggle-pc").checked = currentLog.is_public;
       document.getElementById("is-public-toggle-mobile").checked = currentLog.is_public;
+      document.body.classList.toggle("public-mode", currentLog.is_public);
     }
 
     async function saveMemo() {
@@ -185,9 +203,10 @@
         ? document.getElementById("is-public-toggle-mobile").checked
         : document.getElementById("is-public-toggle-pc").checked;
 
-      // PC・スマホ両方のチェックボックスの状態を同期
+      // PC・スマホ両方のチェックボックスの状態を同期 
       document.getElementById("is-public-toggle-pc").checked = isPublic;
       document.getElementById("is-public-toggle-mobile").checked = isPublic;
+      document.body.classList.toggle("public-mode", isPublic);
 
       await authFetch(`${API}/logs/${logId}`, {
         method: "PUT",
